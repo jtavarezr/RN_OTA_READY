@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "demo-app",
-    "slug": "demo-app",
+    "name": "OTA Demo",
+    "slug": "ota-demo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,11 +20,23 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "package": "com.dev1_tjss.otademo"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-updates",
+        {
+          "checkOnLaunch": "ALWAYS",
+          "enabled": true
+        }
+      ]
+    ],
+    "updates": {
+      "url": "http://192.168.1.48:3000/manifest"
+    },
+    "runtimeVersion": "1.0.0"
   }
 }
