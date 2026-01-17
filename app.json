@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "OTA Demo",
-    "slug": "ota-demo",
+    "name": "JobsPrepAI",
+    "slug": "jobsprepai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -20,7 +20,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dev1_tjss.otademo"
+      "package": "com.jobsprepai.app.v1"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,10 +32,18 @@
           "checkOnLaunch": "ALWAYS",
           "enabled": true
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "updates": {
-      "url": "http://192.168.1.48:3000/manifest"
+      "url": "https://ota.tavarez.dev/manifest"
     },
     "runtimeVersion": "1.0.0"
   }

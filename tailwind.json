@@ -1,0 +1,67 @@
+{
+	"*": {
+		"style": {
+			"--tw-border-spacing-x": 0,
+			"--tw-border-spacing-y": 0,
+			"--tw-ordinal": "",
+			"--tw-slashed-zero": "",
+			"--tw-numeric-figure": "",
+			"--tw-numeric-spacing": "",
+			"--tw-numeric-fraction": "",
+			"--tw-contain-size": "",
+			"--tw-contain-layout": "",
+			"--tw-contain-paint": "",
+			"--tw-contain-style": ""
+		}
+	},
+	"::before": {
+		"style": {
+			"--tw-border-spacing-x": 0,
+			"--tw-border-spacing-y": 0,
+			"--tw-ordinal": "",
+			"--tw-slashed-zero": "",
+			"--tw-numeric-figure": "",
+			"--tw-numeric-spacing": "",
+			"--tw-numeric-fraction": "",
+			"--tw-contain-size": "",
+			"--tw-contain-layout": "",
+			"--tw-contain-paint": "",
+			"--tw-contain-style": ""
+		}
+	},
+	"::after": {
+		"style": {
+			"--tw-border-spacing-x": 0,
+			"--tw-border-spacing-y": 0,
+			"--tw-ordinal": "",
+			"--tw-slashed-zero": "",
+			"--tw-numeric-figure": "",
+			"--tw-numeric-spacing": "",
+			"--tw-numeric-fraction": "",
+			"--tw-contain-size": "",
+			"--tw-contain-layout": "",
+			"--tw-contain-paint": "",
+			"--tw-contain-style": ""
+		}
+	},
+	"::backdrop": {
+		"style": {
+			"--tw-border-spacing-x": 0,
+			"--tw-border-spacing-y": 0,
+			"--tw-ordinal": "",
+			"--tw-slashed-zero": "",
+			"--tw-numeric-figure": "",
+			"--tw-numeric-spacing": "",
+			"--tw-numeric-fraction": "",
+			"--tw-contain-size": "",
+			"--tw-contain-layout": "",
+			"--tw-contain-paint": "",
+			"--tw-contain-style": ""
+		}
+	},
+	"flex": {
+		"style": {
+			"display": "flex"
+		}
+	}
+}

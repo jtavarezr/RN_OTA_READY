@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import * as Updates from 'expo-updates';
 import { Alert } from 'react-native';
 import { logger } from '../utils/logger';
+import { useSettingsStore } from '../context/SettingsStore';
 
 export type OTAStatus = 'idle' | 'checking' | 'downloading' | 'ready' | 'error';
 
@@ -9,6 +10,7 @@ export const useOTA = () => {
   const [status, setStatus] = useState<OTAStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [manifest, setManifest] = useState<any>(null);
+  const { autoUpdate } = useSettingsStore();
 
   const checkUpdates = async () => {
     if (__DEV__) {
@@ -30,14 +32,19 @@ export const useOTA = () => {
         setStatus('ready');
         logger.info('Update ready to apply');
         
-        Alert.alert(
-          'Actualización disponible',
-          'Se ha descargado una nueva versión. ¿Deseas reiniciar la aplicación ahora?',
-          [
-            { text: 'Más tarde', style: 'cancel' },
-            { text: 'Reiniciar', onPress: () => Updates.reloadAsync() },
-          ]
-        );
+        if (autoUpdate) {
+            logger.info('Auto-updating...');
+            await Updates.reloadAsync();
+        } else {
+            Alert.alert(
+              'Actualización disponible',
+              'Se ha descargado una nueva versión. ¿Deseas reiniciar la aplicación ahora?',
+              [
+                { text: 'Más tarde', style: 'cancel' },
+                { text: 'Reiniciar', onPress: () => Updates.reloadAsync() },
+              ]
+            );
+        }
       } else {
         logger.info('No updates available');
         setStatus('idle');
