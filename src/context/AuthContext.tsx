@@ -1,15 +1,26 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { account, ID } from '../services/appwrite';
 import { Models } from 'appwrite';
 import { firebaseAuth, firebaseLogin, firebaseLogout, firebaseRecoverPassword, firebaseRegister, FirebaseUser } from '../services/firebase';
 import { supabase, SupabaseUser } from '../services/supabase';
 import { getAuthProvider } from '../utils/authConfig';
 
+type AuthProviderName = 'appwrite' | 'supabase' | 'firebase';
+
 type AuthUser = Models.User<Models.Preferences> | FirebaseUser | SupabaseUser | null;
+
+type CachedSession = {
+  provider: AuthProviderName;
+  user: any;
+  updatedAt: number;
+  expiresAt: number;
+};
 
 interface AuthContextType {
   user: AuthUser;
   loading: boolean;
+  isOfflineSession: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -20,6 +31,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  isOfflineSession: false,
   login: async () => {},
   register: async () => {},
   logout: async () => {},
@@ -27,30 +39,148 @@ const AuthContext = createContext<AuthContextType>({
   checkSession: async () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AUTH_SESSION_KEY = 'auth:session';
+
+const getCacheTtlMs = () => {
+  const fromEnv = process.env.EXPO_PUBLIC_AUTH_CACHE_TTL_HOURS;
+  const hours = fromEnv ? Number(fromEnv) : 24;
+  const safeHours = Number.isFinite(hours) && hours > 0 ? hours : 24;
+  return safeHours * 60 * 60 * 1000;
+};
+
+const isNetworkError = (error: unknown) => {
+  if (!error) {
+    return false;
+  }
+  const anyError = error as any;
+  const message = String(anyError.message ?? '').toLowerCase();
+  const code = String(anyError.code ?? '').toLowerCase();
+  const name = String(anyError.name ?? '').toLowerCase();
+  const patterns = ['network', 'timeout', 'timed out', 'failed to fetch', 'ecconnrefused', 'econnreset', 'enotfound', 'socket', 'offline'];
+  if (patterns.some((p) => message.includes(p))) {
+    return true;
+  }
+  if (patterns.some((p) => code.includes(p))) {
+    return true;
+  }
+  if (patterns.some((p) => name.includes(p))) {
+    return true;
+  }
+  return false;
+};
+
+const serializeUser = (provider: AuthProviderName, user: AuthUser) => {
+  if (!user) {
+    return null;
+  }
+  const anyUser: any = user;
+  const id = anyUser.$id || anyUser.uid || anyUser.id || '';
+  const email = anyUser.email ?? null;
+  const name = anyUser.name || anyUser.displayName || null;
+  return {
+    provider,
+    $id: id || undefined,
+    uid: anyUser.uid,
+    id: anyUser.id,
+    email,
+    name,
+  };
+};
+
+type AuthProviderProps = {
+  children: React.ReactNode;
+  skipInitialCheck?: boolean;
+};
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children, skipInitialCheck }) => {
   const [user, setUser] = useState<AuthUser>(null);
   const [loading, setLoading] = useState(true);
+  const [isOfflineSession, setIsOfflineSession] = useState(false);
 
   useEffect(() => {
-    checkSession();
-  }, []);
+    if (!skipInitialCheck) {
+      checkSession();
+    }
+  }, [skipInitialCheck]);
+
+  const persistSession = async (provider: AuthProviderName, rawUser: AuthUser) => {
+    if (!rawUser) {
+      await AsyncStorage.removeItem(AUTH_SESSION_KEY);
+      setIsOfflineSession(false);
+      return;
+    }
+    const normalized = serializeUser(provider, rawUser);
+    if (!normalized) {
+      await AsyncStorage.removeItem(AUTH_SESSION_KEY);
+      setIsOfflineSession(false);
+      return;
+    }
+    const now = Date.now();
+    const ttlMs = getCacheTtlMs();
+    const cachedSession: CachedSession = {
+      provider,
+      user: normalized,
+      updatedAt: now,
+      expiresAt: now + ttlMs,
+    };
+    await AsyncStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(cachedSession));
+    setIsOfflineSession(false);
+  };
+
+  const clearSession = async () => {
+    await AsyncStorage.removeItem(AUTH_SESSION_KEY);
+    setIsOfflineSession(false);
+  };
+
+  const tryLoadCachedSessionForCurrentProvider = async () => {
+    try {
+      const stored = await AsyncStorage.getItem(AUTH_SESSION_KEY);
+      if (!stored) {
+        return false;
+      }
+      const parsed = JSON.parse(stored) as CachedSession;
+      const currentProvider = getAuthProvider();
+      if (!parsed || parsed.provider !== currentProvider) {
+        return false;
+      }
+      if (parsed.expiresAt && parsed.expiresAt < Date.now()) {
+        await AsyncStorage.removeItem(AUTH_SESSION_KEY);
+        return false;
+      }
+      if (!parsed.user) {
+        return false;
+      }
+      setUser(parsed.user as AuthUser);
+      setIsOfflineSession(true);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   const checkSession = async () => {
     setLoading(true);
     try {
-      const provider = getAuthProvider();
+      const provider = getAuthProvider() as AuthProviderName;
       if (provider === 'firebase') {
         const current = firebaseAuth.currentUser;
         setUser(current as FirebaseUser | null);
+        await persistSession(provider, current as AuthUser);
       } else if (provider === 'supabase') {
         const { data } = await supabase.auth.getUser();
         setUser(data.user as SupabaseUser | null);
+        await persistSession(provider, data.user as AuthUser);
       } else {
         const session = await account.get();
         setUser(session);
+        await persistSession(provider, session as AuthUser);
       }
-    } catch (error) {
-      setUser(null);
+    } catch {
+      const usedCache = await tryLoadCachedSessionForCurrentProvider();
+      if (!usedCache) {
+        setUser(null);
+        setIsOfflineSession(false);
+      }
     } finally {
       setLoading(false);
     }
@@ -59,20 +189,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const provider = getAuthProvider();
+      const provider = getAuthProvider() as AuthProviderName;
       if (provider === 'firebase') {
         const credentials = await firebaseLogin(email, password);
         setUser(credentials.user as FirebaseUser);
+        await persistSession(provider, credentials.user as AuthUser);
       } else if (provider === 'supabase') {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) {
           throw error;
         }
         setUser(data.user as SupabaseUser | null);
+        await persistSession(provider, data.user as AuthUser);
       } else {
         await account.createEmailPasswordSession(email, password);
         const session = await account.get();
         setUser(session);
+        await persistSession(provider, session as AuthUser);
       }
     } catch (error) {
       setLoading(false);
@@ -85,16 +218,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, password: string) => {
     setLoading(true);
     try {
-      const provider = getAuthProvider();
+      const provider = getAuthProvider() as AuthProviderName;
       if (provider === 'firebase') {
         const credentials = await firebaseRegister(email, password);
         setUser(credentials.user as FirebaseUser);
+        await persistSession(provider, credentials.user as AuthUser);
       } else if (provider === 'supabase') {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) {
           throw error;
         }
         setUser(data.user as SupabaseUser | null);
+        await persistSession(provider, data.user as AuthUser);
       } else {
         await account.create(ID.unique(), email, password);
         await login(email, password);
@@ -110,27 +245,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = async () => {
     setLoading(true);
     try {
-      const provider = getAuthProvider();
+      const provider = getAuthProvider() as AuthProviderName;
       if (provider === 'firebase') {
         await firebaseLogout();
-        setUser(null);
       } else if (provider === 'supabase') {
         await supabase.auth.signOut();
-        setUser(null);
       } else {
         await account.deleteSession('current');
-        setUser(null);
       }
-    } catch (error) {
-      setLoading(false);
-      throw error;
+    } catch {
+      // Ignore remote logout errors and proceed with local cleanup
     } finally {
+      setUser(null);
+      await clearSession();
       setLoading(false);
     }
   };
 
   const recoverPassword = async (email: string) => {
-    const provider = getAuthProvider();
+    const provider = getAuthProvider() as AuthProviderName;
     if (provider === 'firebase') {
       await firebaseRecoverPassword(email);
       return;
@@ -143,7 +276,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, recoverPassword, checkSession }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        isOfflineSession,
+        login,
+        register,
+        logout,
+        recoverPassword,
+        checkSession,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

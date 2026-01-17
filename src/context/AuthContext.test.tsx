@@ -3,7 +3,6 @@ import { renderHook, act, waitFor } from '@testing-library/react-native';
 import { AuthProvider, useAuth } from './AuthContext';
 import * as authConfig from '../utils/authConfig';
 
-// Mocks
 jest.mock('../services/appwrite', () => ({
   account: {
     createEmailPasswordSession: jest.fn(),
@@ -39,6 +38,12 @@ jest.mock('../utils/authConfig', () => ({
   getAuthProvider: jest.fn(),
 }));
 
+jest.mock('@react-native-async-storage/async-storage', () => ({
+  setItem: jest.fn(),
+  getItem: jest.fn(),
+  removeItem: jest.fn(),
+}));
+
 describe('AuthContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -57,7 +62,7 @@ describe('AuthContext', () => {
       appwriteMock.get.mockResolvedValue({ $id: 'user123', email: 'test@example.com' });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -75,7 +80,7 @@ describe('AuthContext', () => {
       appwriteMock.get.mockResolvedValue({ $id: 'user123', email: 'test@example.com' });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -91,7 +96,7 @@ describe('AuthContext', () => {
       appwriteMock.deleteSession.mockResolvedValue({});
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -117,7 +122,7 @@ describe('AuthContext', () => {
       firebaseMock.firebaseLogin.mockResolvedValue({ user: mockUser });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -134,7 +139,7 @@ describe('AuthContext', () => {
       firebaseMock.firebaseRegister.mockResolvedValue({ user: mockUser });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -150,7 +155,7 @@ describe('AuthContext', () => {
       firebaseMock.firebaseLogout.mockResolvedValue({});
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -176,7 +181,7 @@ describe('AuthContext', () => {
       supabaseMock.auth.signInWithPassword.mockResolvedValue({ data: { user: mockUser }, error: null });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -193,7 +198,7 @@ describe('AuthContext', () => {
       supabaseMock.auth.signUp.mockResolvedValue({ data: { user: mockUser }, error: null });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -209,7 +214,7 @@ describe('AuthContext', () => {
       supabaseMock.auth.signOut.mockResolvedValue({ error: null });
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
       );
       const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -219,6 +224,140 @@ describe('AuthContext', () => {
 
       expect(supabaseMock.auth.signOut).toHaveBeenCalled();
       expect(result.current.user).toBeNull();
+    });
+
+    it('logout clears local session even if Supabase signOut fails', async () => {
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+      supabaseMock.auth.signOut.mockRejectedValue(new Error('Network error'));
+
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <AuthProvider skipInitialCheck>{children}</AuthProvider>
+      );
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await act(async () => {
+        await result.current.logout();
+      });
+
+      expect(supabaseMock.auth.signOut).toHaveBeenCalled();
+      expect(result.current.user).toBeNull();
+      expect(AsyncStorage.removeItem).toHaveBeenCalledWith('auth:session');
+    });
+  });
+
+  describe('Offline session fallback', () => {
+    it('uses cached session when checkSession fails with network error', async () => {
+      (authConfig.getAuthProvider as jest.Mock).mockReturnValue('appwrite');
+      const appwriteMock = require('../services/appwrite').account;
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+
+      appwriteMock.get.mockRejectedValue(new Error('Network request failed'));
+
+      const cachedUser = {
+        provider: 'appwrite',
+        $id: 'cached-id',
+        email: 'cached@example.com',
+        name: 'Cached User',
+      };
+
+      const now = Date.now();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({
+          provider: 'appwrite',
+          user: cachedUser,
+          updatedAt: now - 1000,
+          expiresAt: now + 60_000,
+        }),
+      );
+
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <AuthProvider>{children}</AuthProvider>
+      );
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await act(async () => {
+        await result.current.checkSession();
+      });
+
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('auth:session');
+      expect(result.current.user).toEqual(cachedUser);
+      expect(result.current.isOfflineSession).toBe(true);
+    });
+
+    it('uses cached session even for non-network errors', async () => {
+      (authConfig.getAuthProvider as jest.Mock).mockReturnValue('appwrite');
+      const appwriteMock = require('../services/appwrite').account;
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+
+      appwriteMock.get.mockRejectedValue({ message: 'invalid token', code: '401' });
+
+      const cachedUser = {
+        provider: 'appwrite',
+        $id: 'cached-id',
+        email: 'cached@example.com',
+        name: 'Cached User',
+      };
+
+      const now = Date.now();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({
+          provider: 'appwrite',
+          user: cachedUser,
+          updatedAt: now - 1000,
+          expiresAt: now + 60_000,
+        }),
+      );
+
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <AuthProvider>{children}</AuthProvider>
+      );
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await act(async () => {
+        await result.current.checkSession();
+      });
+
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('auth:session');
+      expect(result.current.user).toEqual(cachedUser);
+      expect(result.current.isOfflineSession).toBe(true);
+    });
+
+    it('ignores expired cached sessions', async () => {
+      (authConfig.getAuthProvider as jest.Mock).mockReturnValue('appwrite');
+      const appwriteMock = require('../services/appwrite').account;
+      const AsyncStorage = require('@react-native-async-storage/async-storage');
+
+      appwriteMock.get.mockRejectedValue(new Error('Network request failed'));
+
+      const cachedUser = {
+        provider: 'appwrite',
+        $id: 'cached-id',
+        email: 'cached@example.com',
+        name: 'Cached User',
+      };
+
+      const now = Date.now();
+      (AsyncStorage.getItem as jest.Mock).mockResolvedValue(
+        JSON.stringify({
+          provider: 'appwrite',
+          user: cachedUser,
+          updatedAt: now - 60_000,
+          expiresAt: now - 1,
+        }),
+      );
+
+      const wrapper = ({ children }: { children: React.ReactNode }) => (
+        <AuthProvider>{children}</AuthProvider>
+      );
+      const { result } = renderHook(() => useAuth(), { wrapper });
+
+      await act(async () => {
+        await result.current.checkSession();
+      });
+
+      expect(AsyncStorage.getItem).toHaveBeenCalledWith('auth:session');
+      expect(result.current.user).toBeNull();
+      expect(result.current.isOfflineSession).toBe(false);
     });
   });
 });
