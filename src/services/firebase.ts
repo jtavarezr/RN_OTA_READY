@@ -1,4 +1,5 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -27,6 +28,7 @@ if (!getApps().length) {
 }
 
 export const firebaseAuth = getAuth(app);
+export const db = getFirestore(app);
 
 export type FirebaseUser = User;
 

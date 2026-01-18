@@ -5,6 +5,7 @@ import { Models } from 'appwrite';
 import { firebaseAuth, firebaseLogin, firebaseLogout, firebaseRecoverPassword, firebaseRegister, FirebaseUser } from '../services/firebase';
 import { supabase, SupabaseUser } from '../services/supabase';
 import { getAuthProvider } from '../utils/authConfig';
+import api from '../services/api';
 
 type AuthProviderName = 'appwrite' | 'supabase' | 'firebase';
 
@@ -190,22 +191,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, skipInitia
     setLoading(true);
     try {
       const provider = getAuthProvider() as AuthProviderName;
+      let finalUser: AuthUser = null;
       if (provider === 'firebase') {
         const credentials = await firebaseLogin(email, password);
-        setUser(credentials.user as FirebaseUser);
-        await persistSession(provider, credentials.user as AuthUser);
+        finalUser = credentials.user as FirebaseUser;
       } else if (provider === 'supabase') {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) {
-          throw error;
-        }
-        setUser(data.user as SupabaseUser | null);
-        await persistSession(provider, data.user as AuthUser);
+        if (error) throw error;
+        finalUser = data.user as SupabaseUser | null;
       } else {
         await account.createEmailPasswordSession(email, password);
-        const session = await account.get();
-        setUser(session);
-        await persistSession(provider, session as AuthUser);
+        finalUser = await account.get();
+      }
+      
+      setUser(finalUser);
+      await persistSession(provider, finalUser);
+
+      // Ensure profile exists in Appwrite via bridge server
+      if (finalUser) {
+        const uid = (finalUser as any).$id || (finalUser as any).uid || (finalUser as any).id;
+        if (uid) {
+          // Trigger profile creation/fetch in background
+          api.get(`/api/profile/${uid}`).catch(err => console.error("Error ensuring profile:", err));
+        }
       }
     } catch (error) {
       setLoading(false);
@@ -219,20 +227,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children, skipInitia
     setLoading(true);
     try {
       const provider = getAuthProvider() as AuthProviderName;
+      let finalUser: AuthUser = null;
       if (provider === 'firebase') {
         const credentials = await firebaseRegister(email, password);
-        setUser(credentials.user as FirebaseUser);
-        await persistSession(provider, credentials.user as AuthUser);
+        finalUser = credentials.user as FirebaseUser;
+        setUser(finalUser);
+        await persistSession(provider, finalUser);
       } else if (provider === 'supabase') {
         const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) {
-          throw error;
-        }
-        setUser(data.user as SupabaseUser | null);
-        await persistSession(provider, data.user as AuthUser);
+        if (error) throw error;
+        finalUser = data.user as SupabaseUser | null;
+        setUser(finalUser);
+        await persistSession(provider, finalUser);
       } else {
         await account.create(ID.unique(), email, password);
         await login(email, password);
+        return; // login already handles profile association
+      }
+
+      // Ensure profile exists in Appwrite via bridge server (for Firebase/Supabase)
+      if (finalUser) {
+        const uid = (finalUser as any).$id || (finalUser as any).uid || (finalUser as any).id;
+        if (uid) {
+          api.get(`/api/profile/${uid}`).catch(err => console.error("Error ensuring profile:", err));
+        }
       }
     } catch (error) {
       setLoading(false);

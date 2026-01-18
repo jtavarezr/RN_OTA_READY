@@ -1,4 +1,4 @@
-import { Client, Account, ID } from 'appwrite';
+import { Client, Account, ID, Databases } from 'appwrite';
 
 const client = new Client();
 
@@ -11,5 +11,6 @@ const PROJECT_ID =
 client.setEndpoint(ENDPOINT).setProject(PROJECT_ID);
 
 export const account = new Account(client);
+export const databases = new Databases(client);
 export { ID };
 export default client;

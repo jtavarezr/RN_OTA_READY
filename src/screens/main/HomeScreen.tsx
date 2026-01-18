@@ -27,7 +27,7 @@ export const HomeScreen = () => {
           {t('welcome')}{displayName ? `, ${displayName}` : ''}
         </Text>
         <Text category='p1' style={styles.text}>
-          PRUEBA NEW SERVER OTA! AppWriter vs Firebase.
+          AppWriter vs Firebase.
         </Text>
       </Card>
 

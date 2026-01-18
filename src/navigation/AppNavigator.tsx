@@ -14,6 +14,7 @@ import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 
+// Navigation Stacks
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
