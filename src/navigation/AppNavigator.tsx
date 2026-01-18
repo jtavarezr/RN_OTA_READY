@@ -36,8 +36,8 @@ const BottomTabBar = ({ navigation, state }: any) => {
         >
             <BottomNavigationTab title={t('home')} icon={(props) => <Icon {...props} name='home-outline'/>} />
             <BottomNavigationTab title={t('utility')} icon={(props) => <Icon {...props} name='grid-outline'/>} />
-            <BottomNavigationTab title={t('settings')} icon={(props) => <Icon {...props} name='settings-outline'/>} />
             <BottomNavigationTab title={t('profile')} icon={(props) => <Icon {...props} name='person-outline'/>} />
+            <BottomNavigationTab title={t('settings')} icon={(props) => <Icon {...props} name='settings-outline'/>} />
         </BottomNavigation>
     );
 };
@@ -49,8 +49,8 @@ const MainTabs = () => (
   >
     <Tab.Screen name="Home" component={HomeScreen} />
     <Tab.Screen name="Utility" component={UtilityScreen} />
-    <Tab.Screen name="Settings" component={SettingsScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
+    <Tab.Screen name="Settings" component={SettingsScreen} />
   </Tab.Navigator>
 );
 

@@ -3,6 +3,7 @@ import { View, ScrollView, Image, TouchableOpacity, Alert, RefreshControl, Linki
 import { Text, Button, Icon, useTheme, Avatar } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { EditProfileModal } from '../../components/EditProfileModal';
 import { useAuth } from '../../context/AuthContext';
@@ -35,6 +36,7 @@ const ContactItem = ({ icon, value, label, theme, onPress }: any) => value ? (
 ) : null;
 
 export const ProfileScreen = () => {
+  const { t } = useTranslation();
   const theme = useTheme();
   const tw = useTailwind();
   const insets = useSafeAreaInsets();
@@ -88,7 +90,7 @@ export const ProfileScreen = () => {
         borderBottomColor: theme['border-basic-color-3'],
         paddingTop: Math.max(insets.top, 20)
       }]}>
-        <Text category="h6" style={{ fontWeight: 'bold' }}>Professional Profile</Text>
+        <Text category="h6" style={{ fontWeight: 'bold' }}>{t('profile')}</Text>
         <TouchableOpacity onPress={onRefresh}><Ionicons name="refresh" size={22} color={theme['color-primary-500']} /></TouchableOpacity>
       </View>
 
@@ -122,27 +124,27 @@ export const ProfileScreen = () => {
           </View>
 
           <View style={styles.headerInfo}>
-            <Text category="h4" style={{ fontWeight: 'bold' }}>{profile?.fullName || user?.name || 'User Name'}</Text>
-            <Text category="s1" status="primary" style={{ marginTop: 4 }}>{profile?.headline || 'Professional Headline'}</Text>
+            <Text category="h4" style={{ fontWeight: 'bold' }}>{profile?.fullName || (user as any)?.name || t('userName')}</Text>
+            <Text category="s1" status="primary" style={{ marginTop: 4 }}>{profile?.headline || t('professionalHeadline')}</Text>
             
             <View style={styles.locationRow}>
               <Ionicons name="location-outline" size={14} color={theme['text-hint-color']} />
               <Text appearance="hint" category="c1" style={{ marginLeft: 4 }}>
-                {profile?.city ? `${profile.city}, ${profile.country}` : 'Location not set'}
+                {profile?.city ? `${profile.city}, ${profile.country}` : t('locationNotSet')}
               </Text>
             </View>
           </View>
         </View>
 
         {/* CONTACT QUICK VIEW */}
-        <DetailSection title="Contact Information" icon="call-outline" theme={theme}>
+        <DetailSection title={t('contactInformation')} icon="call-outline" theme={theme}>
           <View style={styles.contactGrid}>
-            <ContactItem icon="mail-outline" label="Email" value={profile?.email} theme={theme} />
-            <ContactItem icon="phone-portrait-outline" label="Phone" value={profile?.phoneNumber} theme={theme} />
+            <ContactItem icon="mail-outline" label={t('email')} value={profile?.email} theme={theme} />
+            <ContactItem icon="phone-portrait-outline" label={t('phone')} value={profile?.phoneNumber} theme={theme} />
             {profile?.links?.portfolio && (
                 <ContactItem 
                     icon="globe-outline" 
-                    label="Portfolio" 
+                    label={t('portfolio')} 
                     value={profile.links.portfolio} 
                     theme={theme} 
                     onPress={() => Linking.openURL(profile.links.portfolio)} 
@@ -152,56 +154,56 @@ export const ProfileScreen = () => {
         </DetailSection>
 
         {/* ABOUT ME */}
-        <DetailSection title="About Me" icon="person-outline" theme={theme}>
-          <Text category="p1" style={{ lineHeight: 22 }}>{profile?.summary || 'Introduce yourself to the world...'}</Text>
+        <DetailSection title={t('aboutMe')} icon="person-outline" theme={theme}>
+          <Text category="p1" style={{ lineHeight: 22 }}>{profile?.summary || t('introduceYourself')}</Text>
           {profile?.hobbies && (
             <View style={{ marginTop: 15 }}>
-              <Text category="s2" appearance="hint">Interests & Hobbies:</Text>
+              <Text category="s2" appearance="hint">{t('interestsAndHobbies')}:</Text>
               <Text category="p2">{profile.hobbies}</Text>
             </View>
           )}
         </DetailSection>
 
         {/* EXPERIENCE */}
-        <DetailSection title="Professional Experience" icon="briefcase-outline" theme={theme}>
+        <DetailSection title={t('professionalExperience')} icon="briefcase-outline" theme={theme}>
           {renderList(profile?.experience, 'title', 'company', 'description', 'dates')}
         </DetailSection>
 
         {/* SKILLS */}
-        <DetailSection title="Skills & Competencies" icon="construct-outline" theme={theme}>
+        <DetailSection title={t('skillsAndCompetencies')} icon="construct-outline" theme={theme}>
            <View style={styles.skillsWrapper}>
              {(Array.isArray(profile?.skills) && profile.skills.length > 0) ? profile.skills.map((s: string, i: number) => (
                <View key={i} style={[styles.skillBadge, { backgroundColor: theme['color-primary-100'] }]}>
                  <Text category="c1" status="primary" style={{ fontWeight: 'bold' }}>{s.toUpperCase()}</Text>
                </View>
-             )) : <Text appearance="hint">Add your skills to stand out.</Text>}
+             )) : <Text appearance="hint">{t('addSkills')}</Text>}
            </View>
         </DetailSection>
 
         {/* EDUCATION & CERTS */}
-        <DetailSection title="Education" icon="school-outline" theme={theme}>
+        <DetailSection title={t('education')} icon="school-outline" theme={theme}>
           {renderList(profile?.education, 'degree', 'institution', undefined, 'dates')}
         </DetailSection>
 
-        <DetailSection title="Certifications" icon="checkmark-circle-outline" theme={theme}>
+        <DetailSection title={t('certifications')} icon="checkmark-circle-outline" theme={theme}>
           {renderList(profile?.certifications, 'name', 'issuer')}
         </DetailSection>
 
         {/* LANGUAGES & OTHERS */}
-        <DetailSection title="Languages" icon="language-outline" theme={theme}>
+        <DetailSection title={t('languages')} icon="language-outline" theme={theme}>
             {renderList(profile?.languages, 'name', 'level')}
         </DetailSection>
 
-        <DetailSection title="Awards & Volunteering" icon="heart-outline" theme={theme}>
-            {profile?.awards?.length > 0 && <Text category="s2" appearance="hint" style={{marginBottom: 5}}>Awards:</Text>}
+        <DetailSection title={t('awardsAndVolunteering')} icon="heart-outline" theme={theme}>
+            {profile?.awards?.length > 0 && <Text category="s2" appearance="hint" style={{marginBottom: 5}}>{t('awards')}:</Text>}
             {renderList(profile?.awards, 'name', 'issuer')}
             
-            {profile?.volunteering?.length > 0 && <Text category="s2" appearance="hint" style={{marginTop: 10, marginBottom: 5}}>Volunteering:</Text>}
+            {profile?.volunteering?.length > 0 && <Text category="s2" appearance="hint" style={{marginTop: 10, marginBottom: 5}}>{t('volunteering')}:</Text>}
             {renderList(profile?.volunteering, 'role', 'organization')}
         </DetailSection>
 
         {/* SOCIAL LINKS */}
-        <DetailSection title="Connect" icon="link-outline" theme={theme}>
+        <DetailSection title={t('connect')} icon="link-outline" theme={theme}>
           <View style={styles.linksRow}>
             {profile?.links?.linkedin && (
               <TouchableOpacity onPress={() => Linking.openURL(profile.links.linkedin)} style={styles.socialBtn}>
@@ -216,7 +218,7 @@ export const ProfileScreen = () => {
           </View>
           {profile?.salaryExpectation && (
             <Text category="c1" appearance="hint" style={{ marginTop: 15, textAlign: 'center' }}>
-              Salary Expectation: {profile.salaryExpectation}
+              {t('salaryExpectation')}: {profile.salaryExpectation}
             </Text>
           )}
         </DetailSection>
