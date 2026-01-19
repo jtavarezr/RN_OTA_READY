@@ -54,8 +54,8 @@ export const NativeAd: React.FC<NativeAdProps> = ({ style }) => {
       <View style={styles.content}>
         <View style={styles.iconAndText}>
           <NativeAsset assetType={NativeAssetType.ICON}>
-             {nativeAd.icon?.uri ? (
-               <Image source={{ uri: nativeAd.icon.uri }} style={styles.icon} />
+             {nativeAd.icon?.url ? (
+               <Image source={{ uri: nativeAd.icon.url }} style={styles.icon} />
              ) : <View style={styles.iconPlaceholder} />}
           </NativeAsset>
 

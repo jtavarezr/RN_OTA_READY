@@ -6,11 +6,11 @@ export default {
     slug: "jobsprepai",
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/icon.png",
+    icon: "./assets/app_Icon_bot.png",
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
-      image: "./assets/splash-icon.png",
+      image: "./assets/app_Icon_bot.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff"
     },
@@ -23,13 +23,13 @@ export default {
     },
     android: {
       adaptiveIcon: {
-        foregroundImage: "./assets/adaptive-icon.png",
+        foregroundImage: "./assets/app_Icon_bot.png",
         backgroundColor: "#ffffff"
       },
       package: "com.jobsprepai.app.v1"
     },
     web: {
-      favicon: "./assets/favicon.png"
+      favicon: "./assets/app_Icon_bot.png"
     },
     plugins: [
       [

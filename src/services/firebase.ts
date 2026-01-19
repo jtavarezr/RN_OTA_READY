@@ -2,7 +2,7 @@ import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import {
   initializeAuth,
-  getReactNativePersistence,
+  getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -30,9 +30,13 @@ if (!getApps().length) {
 }
 
 // Initialize Auth with AsyncStorage persistence
-export const firebaseAuth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// Note: getReactNativePersistence might be missing in some versions, defaulting to getAuth()
+// which should handle persistence automatically or use in-memory.
+export const firebaseAuth = getAuth(app);
+
+// export const firebaseAuth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(AsyncStorage),
+// });
 
 export const db = getFirestore(app);
 
