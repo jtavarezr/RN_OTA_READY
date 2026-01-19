@@ -11,6 +11,7 @@ import { HomeScreen } from '../screens/main/HomeScreen';
 import { UtilityScreen } from '../screens/main/UtilityScreen';
 import { SettingsScreen } from '../screens/main/SettingsScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
+import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 
@@ -38,6 +39,7 @@ const BottomTabBar = ({ navigation, state }: any) => {
             <BottomNavigationTab title={t('utility')} icon={(props) => <Icon {...props} name='grid-outline'/>} />
             <BottomNavigationTab title={t('profile')} icon={(props) => <Icon {...props} name='person-outline'/>} />
             <BottomNavigationTab title={t('settings')} icon={(props) => <Icon {...props} name='settings-outline'/>} />
+            <BottomNavigationTab title="Ads" icon={(props) => <Icon {...props} name='gift-outline'/>} />
         </BottomNavigation>
     );
 };
@@ -51,6 +53,7 @@ const MainTabs = () => (
     <Tab.Screen name="Utility" component={UtilityScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
+    <Tab.Screen name="Ads" component={AdsScreenDemo} />
   </Tab.Navigator>
 );
 

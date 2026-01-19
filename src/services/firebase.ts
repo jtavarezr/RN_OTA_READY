@@ -1,13 +1,15 @@
 import { initializeApp, getApps, FirebaseApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import {
-  getAuth,
+  initializeAuth,
+  getReactNativePersistence,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   User,
 } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY,
@@ -27,7 +29,11 @@ if (!getApps().length) {
   app = getApps()[0]!;
 }
 
-export const firebaseAuth = getAuth(app);
+// Initialize Auth with AsyncStorage persistence
+export const firebaseAuth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
+
 export const db = getFirestore(app);
 
 export type FirebaseUser = User;
@@ -42,4 +48,3 @@ export const firebaseLogout = () => signOut(firebaseAuth);
 
 export const firebaseRecoverPassword = (email: string) =>
   sendPasswordResetEmail(firebaseAuth, email);
-
