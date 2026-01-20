@@ -5,7 +5,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTailwind } from '../utils/tailwind';
 import { useThemeColors } from '../utils/themeColors';
 import { useAuth } from '../context/AuthContext';
+import { useProfileStore } from '../store/useProfileStore';
 
+const DEFAULT_AVATAR = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
+const RANDOM_AVATAR = 'https://i.pravatar.cc/100';
 interface AppHeaderProps extends ViewProps {
   onMenuPress?: () => void;
   onSearchPress?: () => void;
@@ -22,7 +25,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onNotificationPress,
   notificationCount = 5,
   userName,
-  userRole = 'Senior Developer',
   userAvatar,
   style,
   ...props
@@ -31,8 +33,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const tw = useTailwind();
   const { user } = useAuth();
 
-  const displayName = userName || user?.name || 'Alex Rodriguez';
-  const displayAvatar = userAvatar || 'https://i.pravatar.cc/100';
+  const { profile, loading, fetchProfile, updateProfile } = useProfileStore();
+
+  const displayName = userName || profile?.fullName || 'User';
+  const displayAvatar = userAvatar || profile?.profilePicture || DEFAULT_AVATAR || RANDOM_AVATAR;
+  const userRole = profile?.headline || 'Role';
 
   return (
     <SafeAreaView 
