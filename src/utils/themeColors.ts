@@ -1,3 +1,6 @@
+import { useTheme } from '../context/ThemeContext';
+import { useSettingsStore } from '../context/SettingsStore';
+
 export interface ThemeColors {
   primary: string;
   primaryMuted: string;
@@ -10,6 +13,7 @@ export interface ThemeColors {
   warning: string;
   error: string;
   reputation: string;
+  button: string;
 }
 
 export const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => ({
@@ -24,4 +28,18 @@ export const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => ({
   warning: '#f59e0b',
   error: '#ef4444',
   reputation: '#ec4899',
+  button: '#6366f1',
 });
+
+export const useThemeColors = (): ThemeColors => {
+  const { theme } = useTheme();
+  const { primaryColor, buttonColor, fontColor } = useSettingsStore();
+  const base = getThemeColors(theme);
+
+  return {
+    ...base,
+    primary: primaryColor,
+    button: buttonColor,
+    textMain: fontColor || base.textMain,
+  };
+};

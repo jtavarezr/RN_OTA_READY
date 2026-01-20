@@ -6,6 +6,7 @@ import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from './src/context/AuthContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { useSettingsStore } from './src/context/SettingsStore';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { CustomSplashScreen } from './src/components/CustomSplashScreen';
 import './src/i18n';
@@ -18,6 +19,7 @@ SplashScreen.preventAutoHideAsync();
 
 const AppContent = () => {
   const { theme } = useTheme();
+  const { primaryColor, fontColor } = useSettingsStore();
   const [isSplashFinished, setIsSplashFinished] = useState(false);
 
   useEffect(() => {
@@ -38,8 +40,18 @@ const AppContent = () => {
     return <CustomSplashScreen onFinish={() => setIsSplashFinished(true)} />;
   }
 
+  const baseTheme = theme === 'light' ? eva.light : eva.dark;
+  const customTheme = {
+    ...baseTheme,
+    'color-primary-default': primaryColor,
+    'color-primary-500': primaryColor,
+    'color-primary-400': primaryColor,
+    'color-primary-600': primaryColor,
+    ...(fontColor ? { 'text-basic-color': fontColor } : {}),
+  };
+
   return (
-    <ApplicationProvider {...eva} theme={theme === 'light' ? eva.light : eva.dark}>
+    <ApplicationProvider {...eva} theme={customTheme}>
       <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
       <AppNavigator />
     </ApplicationProvider>

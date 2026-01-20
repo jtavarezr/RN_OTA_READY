@@ -20,7 +20,7 @@ import { NativeAd } from '../../components/ads/NativeAd';
 import { NativeAdSmall } from '../../components/ads/NativeAdSmall';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
-import { getThemeColors, ThemeColors } from '../../utils/themeColors';
+import { useThemeColors, ThemeColors } from '../../utils/themeColors';
 
 const { width } = Dimensions.get('window');
 
@@ -109,8 +109,7 @@ const Text = ({ children, category, appearance, colors, style, ...props }: Custo
     label: { fontSize: 11, fontWeight: '600', letterSpacing: 1.2 },
   }[category] : {};
 
-  const { theme } = useTheme();
-  const defaultColors = getThemeColors(theme);
+  const defaultColors = useThemeColors();
   const finalColors = colors || defaultColors;
 
   return (
@@ -130,8 +129,7 @@ const Text = ({ children, category, appearance, colors, style, ...props }: Custo
 
 const Card = ({ children, style, colors, ...props }: CardProps) => {
   const tw = useTailwind();
-  const { theme } = useTheme();
-  const defaultColors = getThemeColors(theme);
+  const defaultColors = useThemeColors();
   const finalColors = colors || defaultColors;
 
   return (
@@ -153,7 +151,7 @@ const Card = ({ children, style, colors, ...props }: CardProps) => {
 
 export const HomeScreen = () => {
   const { theme } = useTheme();
-  const colors = getThemeColors(theme);
+  const colors = useThemeColors();
   const tw = useTailwind();
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');

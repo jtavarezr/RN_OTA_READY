@@ -2,9 +2,8 @@ import React from 'react';
 import { View, TouchableOpacity, Image, Text, ViewProps, Platform, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../context/ThemeContext';
 import { useTailwind } from '../utils/tailwind';
-import { getThemeColors } from '../utils/themeColors';
+import { useThemeColors } from '../utils/themeColors';
 import { useAuth } from '../context/AuthContext';
 
 interface AppHeaderProps extends ViewProps {
@@ -28,8 +27,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   style,
   ...props
 }) => {
-  const { theme } = useTheme();
-  const colors = getThemeColors(theme);
+  const colors = useThemeColors();
   const tw = useTailwind();
   const { user } = useAuth();
 
@@ -48,11 +46,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <View style={tw('flex-row justify-between items-center px-4 py-3')}>
         <View style={tw('flex-row items-center')}>
           <TouchableOpacity style={tw('mr-3')} onPress={onMenuPress}>
-            <Ionicons name="menu" size={24} color={colors.textMain} />
+            <Ionicons name="menu" size={24} color={colors.primary} />
           </TouchableOpacity>
           <Image source={{ uri: displayAvatar }} style={tw('w-10 h-10 rounded-full mr-3')} />
           <View>
-            <Text style={[tw('text-base font-semibold'), { color: colors.textMain }]}>
+            <Text style={[tw('text-base font-semibold'), { color: colors.primary }]}>
               {displayName}
             </Text>
             <Text style={[{ color: colors.textSecondary, fontSize: 12 }]}>
@@ -65,18 +63,18 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             style={tw('w-9 h-9 justify-center items-center mr-3')}
             onPress={onSearchPress}
           >
-            <Ionicons name="search-outline" size={22} color={colors.textSecondary} />
+            <Ionicons name="search-outline" size={22} color={colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity
             style={tw('w-9 h-9 justify-center items-center relative')}
             onPress={onNotificationPress}
           >
             {notificationCount > 0 && (
-              <View style={tw('absolute -top-1 -right-1 bg-red-500 rounded-lg w-4 h-4 justify-center items-center z-10')}>
+              <View style={[tw('absolute -top-1 -right-1 rounded-lg w-4 h-4 justify-center items-center z-10'), { backgroundColor: colors.error }]}>
                 <Text style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>{notificationCount}</Text>
               </View>
             )}
-            <Ionicons name="notifications-outline" size={22} color={colors.textSecondary} />
+            <Ionicons name="notifications-outline" size={22} color={colors.primary} />
           </TouchableOpacity>
         </View>
       </View>
