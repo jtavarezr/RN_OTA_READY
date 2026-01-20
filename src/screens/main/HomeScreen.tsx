@@ -20,39 +20,15 @@ import { NativeAd } from '../../components/ads/NativeAd';
 import { NativeAdSmall } from '../../components/ads/NativeAdSmall';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
+import { getThemeColors, ThemeColors } from '../../utils/themeColors';
+
 const { width } = Dimensions.get('window');
 
 // ─── Interfaces ──────────────────────────────────────────────────────────────
 
 type IconName = keyof typeof Ionicons.glyphMap;
 
-interface ThemeColors {
-  primary: string;
-  primaryMuted: string;
-  background: string;
-  card: string;
-  cardBorder: string;
-  textMain: string;
-  textSecondary: string;
-  success: string;
-  warning: string;
-  error: string;
-  reputation: string;
-}
 
-const getThemeColors = (theme: 'light' | 'dark'): ThemeColors => ({
-  primary: '#6366f1',
-  primaryMuted: 'rgba(99,102,241,0.1)',
-  background: theme === 'dark' ? '#111827' : '#f9fafb',
-  card: theme === 'dark' ? '#1f2937' : '#ffffff',
-  cardBorder: theme === 'dark' ? '#374151' : '#e5e7eb',
-  textMain: theme === 'dark' ? '#f9fafb' : '#1f2937',
-  textSecondary: theme === 'dark' ? '#9ca3af' : '#6b7280',
-  success: '#10b981',
-  warning: '#f59e0b',
-  error: '#ef4444',
-  reputation: '#ec4899',
-});
 
 const shadow = {
   card: { shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.07, shadowRadius: 4, elevation: 3 },
@@ -394,33 +370,8 @@ export const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={[{ flex: 1, backgroundColor: colors.background }, tw('flex-1')]} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={[{ flex: 1, backgroundColor: colors.background }, tw('flex-1')]} edges={['left', 'right']}>
       <StatusBar barStyle={theme === 'dark' ? 'light-content' : 'dark-content'} />
-
-      {/* Header */}
-      <View style={[tw('flex-row justify-between items-center px-4 py-3 border-b'), { backgroundColor: colors.card, borderBottomColor: colors.cardBorder }]}>
-        <View style={tw('flex-row items-center')}>
-          <TouchableOpacity style={tw('mr-3')}>
-            <Ionicons name="menu" size={24} color={colors.textMain} />
-          </TouchableOpacity>
-          <Image source={{ uri: 'https://i.pravatar.cc/100' }} style={tw('w-10 h-10 rounded-full mr-3')} />
-          <View>
-            <Text category="s1" colors={colors}>Alex Rodriguez</Text>
-            <Text appearance="hint" colors={colors} style={{ fontSize: 12 }}>Senior Developer</Text>
-          </View>
-        </View>
-        <View style={tw('flex-row items-center')}>
-          <TouchableOpacity style={tw('w-9 h-9 justify-center items-center mr-3')}>
-            <Ionicons name="search-outline" size={22} color={colors.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={tw('w-9 h-9 justify-center items-center relative')}>
-            <View style={tw('absolute -top-1 -right-1 bg-red-500 rounded-lg w-4 h-4 justify-center items-center z-10')}>
-              <RNText style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>5</RNText>
-            </View>
-            <Ionicons name="notifications-outline" size={22} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </View>
 
       {/* Tabs */}
       <View style={[tw('border-b'), { backgroundColor: colors.card, borderBottomColor: colors.cardBorder }]}>

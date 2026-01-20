@@ -14,6 +14,7 @@ import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
+import { AppHeader } from '../components/AppHeader';
 
 // Navigation Stacks
 const Stack = createStackNavigator();
@@ -47,9 +48,12 @@ const BottomTabBar = ({ navigation, state }: any) => {
 const MainTabs = () => (
   <Tab.Navigator
     tabBar={props => <BottomTabBar {...props} />}
-    screenOptions={{ headerShown: false }}
+    screenOptions={{
+      header: (props) => <AppHeader />,
+      headerShown: true
+    }}
   >
-    <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: true }} />
     <Tab.Screen name="Utility" component={UtilityScreen} />
     <Tab.Screen name="Profile" component={ProfileScreen} />
     <Tab.Screen name="Settings" component={SettingsScreen} />
