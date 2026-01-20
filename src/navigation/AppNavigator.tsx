@@ -15,6 +15,8 @@ import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/AppHeader';
+import { SidebarProvider } from '../context/SidebarContext';
+import { CustomSidebar } from '../components/CustomSidebar';
 
 // Navigation Stacks
 const Stack = createStackNavigator();
@@ -46,19 +48,22 @@ const BottomTabBar = ({ navigation, state }: any) => {
 };
 
 const MainTabs = () => (
-  <Tab.Navigator
-    tabBar={props => <BottomTabBar {...props} />}
-    screenOptions={{
-      header: (props) => <AppHeader />,
-      headerShown: true
-    }}
-  >
-    <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: true }} />
-    <Tab.Screen name="Utility" component={UtilityScreen} />
-    <Tab.Screen name="Profile" component={ProfileScreen} />
-    <Tab.Screen name="Settings" component={SettingsScreen} />
-    <Tab.Screen name="Ads" component={AdsScreenDemo} />
-  </Tab.Navigator>
+  <SidebarProvider>
+    <Tab.Navigator
+      tabBar={props => <BottomTabBar {...props} />}
+      screenOptions={{
+        header: (props) => <AppHeader />,
+        headerShown: true
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: true }} />
+      <Tab.Screen name="Utility" component={UtilityScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Settings" component={SettingsScreen} />
+      <Tab.Screen name="Ads" component={AdsScreenDemo} />
+    </Tab.Navigator>
+    <CustomSidebar />
+  </SidebarProvider>
 );
 
 export const AppNavigator = () => {

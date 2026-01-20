@@ -9,6 +9,8 @@ import { useProfileStore } from '../store/useProfileStore';
 
 const DEFAULT_AVATAR = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 const RANDOM_AVATAR = 'https://i.pravatar.cc/100';
+import { useSidebar } from '../context/SidebarContext';
+
 interface AppHeaderProps extends ViewProps {
   onMenuPress?: () => void;
   onSearchPress?: () => void;
@@ -25,6 +27,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onNotificationPress,
   notificationCount = 5,
   userName,
+ //userRole = 'Senior Developer',
   userAvatar,
   style,
   ...props
@@ -32,10 +35,22 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const colors = useThemeColors();
   const tw = useTailwind();
   const { user } = useAuth();
+  
+  // Try to use sidebar context, but don't fail if used outside provider (though currently it will throw per context definition)
+  // For this app structure, we assume it's inside provider.
+  const { toggleSidebar } = useSidebar();
+
+  const handleMenuPress = () => {
+    if (onMenuPress) {
+      onMenuPress();
+    }
+    else {
+      toggleSidebar();
+    }
+  };
 
   const { profile, loading, fetchProfile, updateProfile } = useProfileStore();
-
-  const displayName = userName || profile?.fullName || 'User';
+  const displayName = userName || profile?.fullName || 'Alex Rodriguez';
   const displayAvatar = userAvatar || profile?.profilePicture || DEFAULT_AVATAR || RANDOM_AVATAR;
   const userRole = profile?.headline || 'Role';
 
@@ -50,7 +65,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     >
       <View style={tw('flex-row justify-between items-center px-4 py-3')}>
         <View style={tw('flex-row items-center')}>
-          <TouchableOpacity style={tw('mr-3')} onPress={onMenuPress}>
+          <TouchableOpacity style={tw('mr-3')} onPress={handleMenuPress}>
             <Ionicons name="menu" size={24} color={colors.primary} />
           </TouchableOpacity>
           <Image source={{ uri: displayAvatar }} style={tw('w-10 h-10 rounded-full mr-3')} />
