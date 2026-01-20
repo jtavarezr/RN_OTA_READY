@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, Image, ViewStyle } from 'react-native';
 import {
   NativeAd as GAMNativeAd,
   NativeAdView,
@@ -7,6 +7,8 @@ import {
   NativeAssetType,
 } from 'react-native-google-mobile-ads';
 import { getAdUnitId } from '../../utils/admobConfig';
+import { useTheme } from '../../context/ThemeContext';
+import { useTailwind } from '../../utils/tailwind';
 
 const adUnitId = getAdUnitId('nativeId');
 
@@ -17,6 +19,16 @@ interface NativeAdProps {
 export const NativeAd: React.FC<NativeAdProps> = ({ style }) => {
   const [nativeAd, setNativeAd] = useState<GAMNativeAd | null>(null);
   const [loading, setLoading] = useState(true);
+  const { theme } = useTheme();
+  const tw = useTailwind();
+
+  const colors = {
+    card: theme === 'dark' ? '#1f2937' : '#ffffff',
+    cardBorder: theme === 'dark' ? '#374151' : '#e5e7eb',
+    textMain: theme === 'dark' ? '#f9fafb' : '#1f2937',
+    textSecondary: theme === 'dark' ? '#9ca3af' : '#6b7280',
+    primary: '#6366f1',
+  };
 
   useEffect(() => {
     if (!adUnitId) return;
@@ -49,39 +61,67 @@ export const NativeAd: React.FC<NativeAdProps> = ({ style }) => {
   return (
     <NativeAdView
       nativeAd={nativeAd}
-      style={[styles.container, style]}
+      style={[{ width: '100%' }, style]}
     >
-      <View style={styles.content}>
-        <View style={styles.iconAndText}>
+      <View
+        style={[
+          tw('rounded-2xl p-4 mb-4 border'),
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.cardBorder,
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.07,
+            shadowRadius: 4,
+            elevation: 3,
+            overflow: 'hidden',
+          },
+        ]}
+      >
+        <View style={tw('flex-row items-center mb-3')}>
           <NativeAsset assetType={NativeAssetType.ICON}>
              {nativeAd.icon?.url ? (
-               <Image source={{ uri: nativeAd.icon.url }} style={styles.icon} />
-             ) : <View style={styles.iconPlaceholder} />}
+               <Image source={{ uri: nativeAd.icon.url }} style={tw('w-12 h-12 rounded-lg bg-gray-100')} />
+             ) : <View style={tw('w-12 h-12 rounded-lg bg-gray-200')} />}
           </NativeAsset>
 
-          <View style={styles.textContainer}>
+          <View style={tw('ml-3 flex-1')}>
             <NativeAsset assetType={NativeAssetType.HEADLINE}>
-              <Text style={styles.headline}>{nativeAd.headline}</Text>
+              <Text style={[tw('text-base font-semibold'), { color: colors.textMain }]} numberOfLines={1}>
+                {nativeAd.headline}
+              </Text>
             </NativeAsset>
             <NativeAsset assetType={NativeAssetType.BODY}>
-              <Text style={styles.tagline} numberOfLines={2}>{nativeAd.body}</Text>
+              <Text style={[tw('text-xs mt-0.5'), { color: colors.textSecondary }]} numberOfLines={2}>
+                {nativeAd.body}
+              </Text>
             </NativeAsset>
             <NativeAsset assetType={NativeAssetType.ADVERTISER}>
-               <Text style={styles.advertiser}>{nativeAd.advertiser}</Text>
+               <Text style={[tw('text-[10px] mt-0.5'), { color: colors.textSecondary }]}>
+                 {nativeAd.advertiser}
+               </Text>
             </NativeAsset>
           </View>
         </View>
 
         {nativeAd.images && nativeAd.images.length > 0 && (
            <NativeAsset assetType={NativeAssetType.IMAGE}>
-             <Image source={{ uri: nativeAd.images[0].url }} style={styles.image} />
+             <Image 
+                source={{ uri: nativeAd.images[0].url }} 
+                style={[tw('w-full h-36 rounded-lg mb-3'), { resizeMode: 'cover' }]} 
+             />
            </NativeAsset>
         )}
 
-        <View style={styles.bottomContainer}>
+        <View style={tw('flex-row justify-end items-center')}>
+           <View style={[tw('px-2 py-0.5 rounded mr-auto'), { backgroundColor: theme === 'dark' ? '#374151' : '#f3f4f6' }]}>
+                <Text style={{ fontSize: 9, color: theme === 'dark' ? '#9ca3af' : '#6b7280', fontWeight: '700' }}>
+                  AD
+                </Text>
+           </View>
            <NativeAsset assetType={NativeAssetType.CALL_TO_ACTION}>
-              <View style={styles.callToAction}>
-                 <Text style={styles.callToActionText}>{nativeAd.callToAction}</Text>
+              <View style={[tw('px-4 py-2 rounded-lg'), { backgroundColor: colors.primary }]}>
+                 <Text style={tw('text-white text-xs font-bold')}>{nativeAd.callToAction}</Text>
               </View>
            </NativeAsset>
         </View>
@@ -90,79 +130,4 @@ export const NativeAd: React.FC<NativeAdProps> = ({ style }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    backgroundColor: 'white',
-    padding: 10,
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-  },
-  content: {
-    flex: 1,
-  },
-  iconAndText: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  icon: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-  },
-  iconPlaceholder: {
-    width: 50,
-    height: 50,
-    borderRadius: 8,
-    backgroundColor: '#eee',
-  },
-  textContainer: {
-    marginLeft: 10,
-    flex: 1,
-  },
-  headline: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    color: 'black',
-  },
-  tagline: {
-    fontSize: 12,
-    color: 'gray',
-  },
-  advertiser: {
-    fontSize: 10,
-    color: 'gray',
-  },
-  image: {
-    width: '100%',
-    height: 150,
-    resizeMode: 'cover',
-    marginBottom: 10,
-    borderRadius: 4,
-  },
-  bottomContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 5,
-  },
-  callToAction: {
-    height: 40,
-    paddingHorizontal: 20,
-    backgroundColor: '#4285F4',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 5,
-    elevation: 2,
-  },
-  callToActionText: {
-    fontSize: 14,
-    color: 'white',
-    fontWeight: 'bold',
-  },
-});
+export default NativeAd;
