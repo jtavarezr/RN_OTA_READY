@@ -26,7 +26,7 @@ export const SettingsScreen = () => {
   const colors = ['#6366f1', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#1f2937'];
 
   return (
-    <ScreenLayout>
+    <ScreenLayout safeArea={false}>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text category='h4' style={styles.title}>{t('settings')}</Text>
 
@@ -96,14 +96,14 @@ export const SettingsScreen = () => {
 
 const styles = StyleSheet.create({
   title: {
-    marginVertical: 16,
+    marginVertical: 1,
   },
   subtitle: {
     marginVertical: 12,
     marginLeft: 4,
   },
   section: {
-    padding: 16,
+    padding: 1,
     borderRadius: 8,
     marginBottom: 24,
   },

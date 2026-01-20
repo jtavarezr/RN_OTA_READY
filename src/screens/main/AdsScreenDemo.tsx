@@ -18,7 +18,7 @@ export const AdsScreenDemo = () => {
   const { loaded: appOpenLoaded } = useAppOpenAd();
 
   return (
-    <ScreenLayout>
+    <ScreenLayout safeArea={false}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text category='h4' style={styles.title}>AdMob Demo</Text>
         <Text category='p1' style={styles.subtitle}>
@@ -127,53 +127,17 @@ export const AdsScreenDemo = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingBottom: 20,
-  },
-  title: {
-    marginVertical: 10,
-    textAlign: 'center',
-  },
-  subtitle: {
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#8F9BB3',
-  },
-  sectionTitle: {
-    marginTop: 20,
-    marginBottom: 10,
-    marginLeft: 4,
-  },
-  divider: {
-    marginVertical: 10,
-  },
-  card: {
-    marginBottom: 16,
-  },
-  description: {
-    marginBottom: 12,
-    color: '#8F9BB3',
-  },
-  bannerContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    backgroundColor: '#f0f0f0',
-    padding: 5,
-    borderRadius: 4,
-  },
-  button: {
-    marginTop: 8,
-  },
-  rewardText: {
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-  nativeAd: {
-    marginTop: 10,
-  },
-  statusContainer: {
-    padding: 12,
-    borderRadius: 8,
-    gap: 4,
-  },
+  container: {paddingBottom: 20, },
+  title: {marginVertical: 10, textAlign: 'center', },
+  subtitle: {marginBottom: 20, textAlign: 'center', color: '#8F9BB3',},
+  sectionTitle: {marginTop: 20, marginBottom: 10, marginLeft: 4, },
+  divider: {marginVertical: 10, },
+  card: {marginBottom: 16, },
+  description: {marginBottom: 12, color: '#8F9BB3', },
+  bannerContainer: {alignItems: 'center', marginTop: 10, backgroundColor: '#f0f0f0', 
+    padding: 5, borderRadius: 4, },
+  button: {marginTop: 8, },
+  rewardText: {marginBottom: 8, fontWeight: 'bold',},
+  nativeAd: { marginTop: 10, },
+  statusContainer: {padding: 12, borderRadius: 8, gap: 4, },
 });

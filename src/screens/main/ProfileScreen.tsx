@@ -85,14 +85,6 @@ export const ProfileScreen = () => {
   return (
     <ScreenLayout safeArea={false}>
       {/* Navbar Custom */}
-      <View style={[styles.navBar, { 
-        backgroundColor: theme['background-basic-color-1'], 
-        borderBottomColor: theme['border-basic-color-3'],
-        paddingTop: Math.max(insets.top, 20)
-      }]}>
-        <Text category="h6" style={{ fontWeight: 'bold' }}>{t('profile')}</Text>
-        <TouchableOpacity onPress={onRefresh}><Ionicons name="refresh" size={22} color={theme['color-primary-500']} /></TouchableOpacity>
-      </View>
 
       <ScrollView 
         style={{ flex: 1 }}
@@ -239,14 +231,13 @@ export const ProfileScreen = () => {
 
 const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  navBar: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    paddingHorizontal: 20, 
-    paddingVertical: 15, 
-    paddingTop: Platform.OS === 'ios' ? 50 : 20, 
-    borderBottomWidth: 1 
+  navBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    borderBottomWidth: 1
   },
   banner: { width: '100%', height: 150 },
   avatarContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 20, marginTop: -50 },

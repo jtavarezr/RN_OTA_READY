@@ -33,20 +33,18 @@ export const UtilityScreen = () => {
   };
 
   return (
-    <ScreenLayout>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text category='h4' style={styles.title}>{t('utility')}</Text>
-        
+    <ScreenLayout safeArea={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>        
         <Card style={styles.card}>
           <Text category='h6'>Over-The-Air Updates</Text>
           <Text category='p2' style={styles.description}>
-            Runtime: {runtimeVersion ? runtimeVersion : (__DEV__ ? 'Development (Expo Go)' : 'N/A')}
+            Runtime: {runtimeVersion ? runtimeVersion : (__DEV__ ? 'Development' : 'N/A')}
           </Text>
           <Text category='c1' appearance='hint' style={styles.version}>
             Update ID: {updateId || 'Native'}
           </Text>
           
-          <View style={[styles.statusContainer, tailwind('mt-4 mb-4')]}>
+          <View style={[styles.statusContainer, tailwind('mt-4 mb-8')]}>
             <Text category='s1'>Status: </Text>
             <Text category='s1' status={getStatusColor()}>{status.toUpperCase()}</Text>
           </View>
@@ -114,7 +112,7 @@ export const UtilityScreen = () => {
 
 const styles = StyleSheet.create({
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 1,
   },
   title: {
     marginVertical: 16,
