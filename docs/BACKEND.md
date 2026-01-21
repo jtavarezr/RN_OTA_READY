@@ -80,3 +80,31 @@ The server follows a standard MVC-ish pattern:
 - **`chat_messages`**: Stores individual message history.
 - **`services`**: Configures costs and limits for various AI tools.
 - **`wallets`**: Tracks user balances and global platform stats.
+
+## Deployment (Production)
+
+We use **Docker** for containerized deployment, optimized for **Dokploy**.
+
+### 1. Domain Configuration
+
+- Main API: `backend.app.jobsprepai.com`
+- Dokploy should be configured to point this domain to the internal port `3030`.
+
+### 2. Deployment Steps
+
+1. Push the code to the `chatbot` branch.
+2. In Dokploy, create a new **Compose** application pointing to the `server/`
+   directory.
+3. Add the following Environment Variables in the Dokploy dashboard:
+   - `NODE_ENV=production`
+   - `PORT=3030`
+   - `APPWRITE_ENDPOINT`
+   - `APPWRITE_PROJECT_ID`
+   - `APPWRITE_API_KEY`
+   - `GEMINI_API_KEY`
+4. Deploy.
+
+### 3. Docker Maintenance
+
+- Review logs via `docker logs jobsprepai-backend`.
+- Restart service: `docker-compose restart`.
