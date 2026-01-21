@@ -37,7 +37,14 @@ The server follows a standard MVC-ish pattern:
 - **Audio**: Uses `multer.memoryStorage()` to process audio buffers directly
   without saving to disk.
 
-### 2. Wallet & Economy
+### 2. CV & Resume Analysis
+
+- **Endpoints**: `/api/cv/analyze`, `/api/cv/reports`.
+- **Logic**: Analyzes Job Descriptions vs Resumes using Gemini's multimodal
+  capabilities (supports text and PDF).
+- **Features**: Basic and Advanced reports, credit-integrated, history-logged.
+
+### 3. Wallet & Economy
 
 - **Endpoints**: `/api/wallet/balance`, `/api/wallet/earn`, `/api/wallet/spend`.
 - **Logic**: Deducts credits based on service costs defined in the `services`
@@ -78,6 +85,7 @@ The server follows a standard MVC-ish pattern:
 - **`chat_sessions`**: Stores session state, interaction counts, and user
   mapping.
 - **`chat_messages`**: Stores individual message history.
+- **`cv_reports`**: Stores job compatibility analysis results.
 - **`services`**: Configures costs and limits for various AI tools.
 - **`wallets`**: Tracks user balances and global platform stats.
 

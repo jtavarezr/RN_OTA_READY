@@ -81,7 +81,7 @@ export const CustomSidebar = () => {
     {
       title: null,
       items: [
-        { label: t('home') || 'Home', icon: 'home-outline', screen: 'Home' },
+        { label: t('home.title') || 'Home', icon: 'home-outline', screen: 'Home' },
         { label: t('utility') || 'Utility', icon: 'grid-outline', screen: 'Utility' },
         { label: t('profile') || 'Profile', icon: 'person-outline', screen: 'Profile' },
         { label: t('settings') || 'Settings', icon: 'settings-outline', screen: 'Settings' },
@@ -89,10 +89,10 @@ export const CustomSidebar = () => {
       ]
     },
     {
-      title: 'Career Tools',
+      title: t('quickAccess'),
       items: [
-        { label: 'Job & Resume compatibility', icon: 'analytics-outline', screen: 'JobResumeCompatibility' },
-        { label: 'AI Career Coach', icon: 'chatbubbles-outline', screen: 'CareerCoach' },
+        { label: t('jobResume.title'), icon: 'analytics-outline', screen: 'JobResumeCompatibility' },
+        { label: t('careerCoach.title'), icon: 'chatbubbles-outline', screen: 'CareerCoach' },
       ]
     }
   ];

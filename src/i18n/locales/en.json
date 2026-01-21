@@ -189,7 +189,19 @@
       "next": "Next Step",
       "analyze": "Analyze Compatibility",
       "share": "Share Report",
-      "back": "Back"
+      "back": "Back",
+      "payAndAnalyze": "Pay & Analyze ({{cost}} Credits)",
+      "analysisFailed": "Analysis failed. No result received.",
+      "transactionFailed": "Transaction failed. Please try again."
+    },
+    "analysisReport": {
+      "matchScore": "Match Score",
+      "executiveSummary": "Executive Summary",
+      "strengths": "Strengths",
+      "toImprove": "To Improve",
+      "scoreOutOf100": "{{score}}/100",
+      "pros": "PROS",
+      "cons": "CONS"
     }
   },
   "careerCoach": {

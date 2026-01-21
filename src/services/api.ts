@@ -7,7 +7,7 @@ console.log('DEBUG: API BASE_URL:', BASE_URL); // Log URL to verify
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 15000,
+  timeout: 60000,
 });
 
 export default api;

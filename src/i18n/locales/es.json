@@ -189,7 +189,19 @@
       "next": "Siguiente Paso",
       "analyze": "Analizar Compatibilidad",
       "share": "Compartir Reporte",
-      "back": "Atrás"
+      "back": "Atrás",
+      "payAndAnalyze": "Pagar y Analizar ({{cost}} Créditos)",
+      "analysisFailed": "Error en el análisis. No se recibió ningún resultado.",
+      "transactionFailed": "Transacción fallida. Por favor, inténtelo de nuevo."
+    },
+    "analysisReport": {
+      "matchScore": "Puntaje de Coincidencia",
+      "executiveSummary": "Resumen Ejecutivo",
+      "strengths": "Fortalezas",
+      "toImprove": "A Mejorar",
+      "scoreOutOf100": "{{score}}/100",
+      "pros": "PROS",
+      "cons": "CONTRAS"
     }
   },
   "careerCoach": {

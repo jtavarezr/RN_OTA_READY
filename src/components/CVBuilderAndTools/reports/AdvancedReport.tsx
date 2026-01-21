@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Speech from 'expo-speech';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '../../../utils/themeColors';
 import { useTailwind } from '../../../utils/tailwind';
 
@@ -21,34 +23,87 @@ interface AdvancedReportProps {
 }
 
 export const AdvancedReport: React.FC<AdvancedReportProps> = ({ data }) => {
+  const { t, i18n } = useTranslation();
   const colors = useThemeColors();
   const tw = useTailwind();
+  const [isSpeaking, setIsSpeaking] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  const handleToggleSpeech = async () => {
+    if (isSpeaking) {
+      Speech.stop();
+      setIsSpeaking(false);
+    } else {
+      setIsSpeaking(true);
+      Speech.speak(data.summary, {
+        language: i18n.language || 'en',
+        onDone: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
+      });
+    }
+  };
 
   return (
     <View style={tw('w-full')}>
       {/* OVERALL SCORE CARD */}
       <View style={[styles.reportCard, { backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-        <View style={tw('flex-row justify-between items-start')}>
-            <View>
-                <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>Match Score</Text>
-                <Text style={[tw('text-5xl font-black'), { color: colors.primary }]}>{data.score}<Text style={{fontSize: 20}}>%</Text></Text>
-                <View style={[tw('mt-2 px-3 py-1 rounded-lg self-start'), { backgroundColor: data.score > 80 ? colors.success + '20' : colors.warning + '20' }]}>
-                    <Text style={{ color: data.score > 80 ? colors.success : colors.warning, fontWeight: '800', fontSize: 12 }}>{data.verdict.toUpperCase()}</Text>
-                </View>
+        <View style={{ flexDirection: 'column' /* siempre vertical */ }}>
+          
+          {/* SCORE */}
+          <View>
+            <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>
+              {t('jobResume.analysisReport.matchScore')}
+            </Text>
+            
+            <View style={tw('flex-row justify-between items-center')}>
+              <Text style={[tw('text-5xl font-black'), { color: colors.primary }]}>
+                <Text style={{ fontSize: 50 }}>{data.score}%</Text>
+              </Text>
+
+              <TouchableOpacity onPress={handleToggleSpeech} activeOpacity={0.7}>
+                <Ionicons 
+                  name={isSpeaking ? "stop-circle" : "volume-high"} 
+                  size={42} 
+                  color={colors.primary} 
+                />
+              </TouchableOpacity>
             </View>
-            <View style={{ flex: 1, paddingLeft: 20 }}>
-                <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>Executive Summary</Text>
-                <Text style={[tw('text-sm leading-5'), { color: colors.textMain }]}>{data.summary}</Text>
+
+            <View style={[tw('mt-2 px-3 py-1 rounded-lg self-start'), { backgroundColor: data.score > 80 ? colors.success + '20' : colors.warning + '20' }]}>
+              <Text style={{ color: data.score > 80 ? colors.success : colors.warning, fontWeight: '700', fontSize: 12 }}>
+                {data.verdict.toUpperCase()}
+              </Text>
             </View>
+          </View>
+
+          {/* SPACING */}
+          <View style={{ height: 20 }} />
+
+          {/* EXECUTIVE SUMMARY */}
+          <View>
+            <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>
+              {t('jobResume.analysisReport.executiveSummary')}
+            </Text>
+            <Text style={[tw('text-sm leading-5'), { color: colors.textMain }]}>
+              {data.summary}
+            </Text>
+          </View>
+
         </View>
       </View>
+
 
       {/* SECTIONS */}
       {data.sections.map((section, idx) => (
         <View key={idx} style={[styles.reportCard, { backgroundColor: colors.card, borderColor: colors.cardBorder, padding: 0 }]}>
           <View style={[tw('flex-row justify-between items-center p-4 border-b'), { borderBottomColor: colors.cardBorder }]}>
             <Text style={[tw('text-base font-bold'), { color: colors.textMain }]}>{section.title}</Text>
-            <Text style={[tw('font-black'), { color: colors.primary }]}>{section.score}/100</Text>
+            <Text style={[tw('font-black'), { color: colors.primary }]}>{t('jobResume.analysisReport.scoreOutOf100', { score: section.score })}</Text>
           </View>
 
           <View style={tw('p-4')}>
@@ -75,7 +130,7 @@ export const AdvancedReport: React.FC<AdvancedReportProps> = ({ data }) => {
         <View style={[styles.reportCard, { flex: 1, backgroundColor: colors.card, borderColor: colors.cardBorder, padding: 15 }]}>
           <View style={tw('flex-row items-center mb-3')}>
             <Ionicons name="trending-up" size={16} color={colors.success} style={tw('mr-2')} />
-            <Text style={[tw('font-bold text-sm'), { color: colors.textMain }]}>Strengths</Text>
+            <Text style={[tw('font-bold text-sm'), { color: colors.textMain }]}>{t('jobResume.analysisReport.strengths')}</Text>
           </View>
           {data.strengths.map((s, i) => (
             <Text key={i} style={[tw('text-xs mb-2 leading-4'), { color: colors.textSecondary }]}>• {s}</Text>
@@ -84,7 +139,7 @@ export const AdvancedReport: React.FC<AdvancedReportProps> = ({ data }) => {
         <View style={[styles.reportCard, { flex: 1, backgroundColor: colors.card, borderColor: colors.cardBorder, padding: 15 }]}>
            <View style={tw('flex-row items-center mb-3')}>
             <Ionicons name="build" size={16} color={colors.warning} style={tw('mr-2')} />
-            <Text style={[tw('font-bold text-sm'), { color: colors.textMain }]}>To Improve</Text>
+            <Text style={[tw('font-bold text-sm'), { color: colors.textMain }]}>{t('jobResume.analysisReport.toImprove')}</Text>
           </View>
           {data.improvements.map((s, i) => (
             <Text key={i} style={[tw('text-xs mb-2 leading-4'), { color: colors.textSecondary }]}>• {s}</Text>

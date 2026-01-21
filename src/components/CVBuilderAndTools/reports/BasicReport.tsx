@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { useThemeColors } from '../../../utils/themeColors';
 import { useTailwind } from '../../../utils/tailwind';
 
@@ -15,6 +16,7 @@ interface BasicReportProps {
 }
 
 export const BasicReport: React.FC<BasicReportProps> = ({ data }) => {
+  const { t } = useTranslation();
   const colors = useThemeColors();
   const tw = useTailwind();
 
@@ -34,7 +36,9 @@ export const BasicReport: React.FC<BasicReportProps> = ({ data }) => {
 
       <View style={tw('flex-row gap-3')}>
         <View style={[styles.card, { flex: 1, backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-          <Text style={[tw('font-bold text-sm mb-2 text-center'), { color: colors.success }]}>PROS</Text>
+          <Text style={[tw('font-bold text-sm mb-2 text-center'), { color: colors.success }]}>
+            {t('jobResume.analysisReport.pros')}
+          </Text>
           {data.pros.map((item, index) => (
             <View key={index} style={tw('flex-row items-start mb-2')}>
                <Ionicons name="checkmark" size={14} color={colors.success} style={tw('mr-1 mt-0.5')} />
@@ -44,7 +48,9 @@ export const BasicReport: React.FC<BasicReportProps> = ({ data }) => {
         </View>
 
         <View style={[styles.card, { flex: 1, backgroundColor: colors.card, borderColor: colors.cardBorder }]}>
-          <Text style={[tw('font-bold text-sm mb-2 text-center'), { color: colors.error }]}>CONS</Text>
+          <Text style={[tw('font-bold text-sm mb-2 text-center'), { color: colors.error }]}>
+            {t('jobResume.analysisReport.cons')}
+          </Text>
           {data.cons.map((item, index) => (
             <View key={index} style={tw('flex-row items-start mb-2')}>
                <Ionicons name="close" size={14} color={colors.error} style={tw('mr-1 mt-0.5')} />

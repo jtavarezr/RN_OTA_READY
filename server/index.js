@@ -10,6 +10,7 @@ const ProfileModel = require('./models/profileModel');
 const WalletModel = require('./models/walletModel');
 const TransactionModel = require('./models/transactionModel');
 const ServiceModel = require('./models/serviceModel');
+const CVModel = require('./models/cvModel');
 
 const app = express();
 app.use(cors());
@@ -73,12 +74,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // --- Routes ---
 const chatRoutes = require('./routes/chatRoutes');
+const cvRoutes = require('./routes/cvRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const ChatModel = require('./models/chatModel');
 // ...
 app.use('/api', profileRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/cv', cvRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Admin UI Route
@@ -95,7 +98,8 @@ if (process.env.NODE_ENV !== 'test') {
         WalletModel.setupDatabase(),
         TransactionModel.setupDatabase(),
         ServiceModel.setupDatabase(),
-        ChatModel.setupDatabase()
+        ChatModel.setupDatabase(),
+        CVModel.setupDatabase()
     ]).then(() => {
         app.listen(PORT, () => {
             console.log(`Server running at http://localhost:${PORT}`);
