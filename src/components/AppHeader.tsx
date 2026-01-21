@@ -49,7 +49,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }
   };
 
-  const { profile, loading, fetchProfile, updateProfile } = useProfileStore();
+  const { profile } = useProfileStore();
   const displayName = userName || profile?.fullName || 'Alex Rodriguez';
   const displayAvatar = userAvatar || profile?.profilePicture || DEFAULT_AVATAR || RANDOM_AVATAR;
   const userRole = profile?.headline || 'Role';

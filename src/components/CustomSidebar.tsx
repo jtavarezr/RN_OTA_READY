@@ -8,9 +8,11 @@ import {
   Dimensions,
   Pressable,
   Image,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Divider } from '@ui-kitten/components';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -75,12 +77,23 @@ export const CustomSidebar = () => {
     await logout();
   };
 
-  const menuItems = [
-    { label: t('home') || 'Home', icon: 'home-outline', screen: 'Home' },
-    { label: t('utility') || 'Utility', icon: 'grid-outline', screen: 'Utility' },
-    { label: t('profile') || 'Profile', icon: 'person-outline', screen: 'Profile' },
-    { label: t('settings') || 'Settings', icon: 'settings-outline', screen: 'Settings' },
-    { label: 'Ads Demo', icon: 'gift-outline', screen: 'Ads' },
+  const menuGroups = [
+    {
+      title: null,
+      items: [
+        { label: t('home') || 'Home', icon: 'home-outline', screen: 'Home' },
+        { label: t('utility') || 'Utility', icon: 'grid-outline', screen: 'Utility' },
+        { label: t('profile') || 'Profile', icon: 'person-outline', screen: 'Profile' },
+        { label: t('settings') || 'Settings', icon: 'settings-outline', screen: 'Settings' },
+        { label: 'Ads Demo', icon: 'gift-outline', screen: 'Ads' },
+      ]
+    },
+    {
+      title: 'Career Tools',
+      items: [
+        { label: 'Job & Resume compatibility', icon: 'analytics-outline', screen: 'JobResumeCompatibility' },
+      ]
+    }
   ];
 
   return (
@@ -127,9 +140,6 @@ export const CustomSidebar = () => {
                     <Text style={[tw('text-base font-bold'), { color: colors.textSecondary }]} numberOfLines={1}>
                         {user?.email || 'User'}
                     </Text>
-                    {/* <Text style={[tw('text-xs'), { color: colors.textSecondary }]} numberOfLines={1}>
-                        {user?.email || 'user@example.com'}
-                    </Text> */}
                 </View>
             </View>
             <TouchableOpacity onPress={closeSidebar} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
@@ -138,25 +148,35 @@ export const CustomSidebar = () => {
         </View>
 
         {/* Menu Items */}
-        <View style={tw('flex-1 py-4')}>
-          {menuItems.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[tw('flex-row items-center px-4 py-3 mb-1 mx-2 rounded-lg')]}
-              onPress={() => handleNavigation(item.screen)}
-            >
-              <Ionicons
-                name={item.icon as any}
-                size={22}
-                color={colors.primary}
-                style={tw('mr-3')}
-              />
-              <Text style={[tw('text-base'), { color: colors.textSecondary }]}>
-                {item.label}
-              </Text>
-            </TouchableOpacity>
+        <ScrollView style={tw('flex-1 py-4')}>
+          {menuGroups.map((group, gIndex) => (
+            <View key={gIndex} style={tw('mb-4')}>
+              {group.title && (
+                <Text style={[tw('px-6 py-2 text-xs font-bold uppercase'), { color: colors.textSecondary, opacity: 0.6 }]}>
+                  {group.title}
+                </Text>
+              )}
+              {group.items.map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[tw('flex-row items-center px-4 py-3 mb-1 mx-2 rounded-lg')]}
+                  onPress={() => handleNavigation(item.screen)}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={22}
+                    color={colors.primary}
+                    style={tw('mr-3')}
+                  />
+                  <Text style={[tw('text-base'), { color: colors.textSecondary }]}>
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+              {gIndex < menuGroups.length - 1 && <Divider style={tw('mx-4 mt-2')} />}
+            </View>
           ))}
-        </View>
+        </ScrollView>
 
         {/* Footer / Logout */}
         <View style={tw('p-4 border-t border-gray-200 dark:border-gray-700')}>

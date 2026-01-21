@@ -92,5 +92,46 @@
   "updateBanner": "Actualizar Banner",
   "imageUrl": "URL de la Imagen",
   "confirmChange": "Confirmar Cambio",
-  "add": "Añadir"
+  "add": "Añadir",
+  "jobResume": {
+    "title": "Verificar Compatibilidad",
+    "steps": {
+      "job": "Detalles Empleo",
+      "resume": "Candidato",
+      "report": "Análisis"
+    },
+    "step1": {
+      "title": "Definir Rol",
+      "reportType": "Tipo de Reporte",
+      "basic": "Rápido y Simple",
+      "advanced": "Análisis Profundo",
+      "jobTitle": "Título del Puesto",
+      "jobTitlePlaceholder": "ej. Diseñador Senior de Producto",
+      "source": "Fuente de Requisitos",
+      "pasteText": "Pegar Texto",
+      "uploadFile": "Subir Archivo",
+      "pastePlaceholder": "Pegar descripción completa del trabajo...",
+      "selectFile": "Seleccionar PDF o DOCX"
+    },
+    "step2": {
+      "title": "Perfil del Candidato",
+      "subtitle": "Sube o pega el currículum del candidato para comparar.",
+      "inputType": "Tipo de Entrada",
+      "pastePlaceholder": "Pegar contenido del currículum aquí...",
+      "tapToUpload": "Toca para subir CV",
+      "ready": "Listo para analizar",
+      "fileType": "PDF, DOCX, TXT"
+    },
+    "step3": {
+      "title": "Análisis Completo",
+      "calculating": "CALCULANDO COINCIDENCIA...",
+      "analyzing": "REALIZANDO ANÁLISIS PROFUNDO..."
+    },
+    "actions": {
+      "next": "Siguiente Paso",
+      "analyze": "Analizar Compatibilidad",
+      "share": "Compartir Reporte",
+      "back": "Atrás"
+    }
+  }
 }

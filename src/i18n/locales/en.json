@@ -92,5 +92,46 @@
   "updateBanner": "Update Banner",
   "imageUrl": "Image URL",
   "confirmChange": "Confirm Change",
-  "add": "Add"
+  "add": "Add",
+  "jobResume": {
+    "title": "Compatibility Check",
+    "steps": {
+      "job": "Job Details",
+      "resume": "Candidate",
+      "report": "Analysis"
+    },
+    "step1": {
+      "title": "Define the Role",
+      "reportType": "Report Type",
+      "basic": "Quick & Simple",
+      "advanced": "Deep Analysis",
+      "jobTitle": "Job Title",
+      "jobTitlePlaceholder": "e.g. Senior Product Designer",
+      "source": "Requirements Source",
+      "pasteText": "Paste Text",
+      "uploadFile": "Upload File",
+      "pastePlaceholder": "Paste full job description...",
+      "selectFile": "Select PDF or DOCX"
+    },
+    "step2": {
+      "title": "Candidate Profile",
+      "subtitle": "Upload or paste the candidate's resume to compare.",
+      "inputType": "Input Type",
+      "pastePlaceholder": "Paste resume content here...",
+      "tapToUpload": "Tap to Upload Resume",
+      "ready": "Ready to analyze",
+      "fileType": "PDF, DOCX, TXT"
+    },
+    "step3": {
+      "title": "Analysis Complete",
+      "calculating": "CALCULATING MATCH...",
+      "analyzing": "PERFORMING DEEP ANALYSIS..."
+    },
+    "actions": {
+      "next": "Next Step",
+      "analyze": "Analyze Compatibility",
+      "share": "Share Report",
+      "back": "Back"
+    }
+  }
 }

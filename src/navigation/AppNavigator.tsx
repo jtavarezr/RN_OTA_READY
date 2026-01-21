@@ -12,6 +12,7 @@ import { UtilityScreen } from '../screens/main/UtilityScreen';
 import { SettingsScreen } from '../screens/main/SettingsScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
+import { JobResumeCompatibility } from '../components/CVBuilderAndTools/JobResumeCompatibility';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/AppHeader';
@@ -61,6 +62,11 @@ const MainTabs = () => (
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
       <Tab.Screen name="Ads" component={AdsScreenDemo} />
+      <Tab.Screen 
+        name="JobResumeCompatibility" 
+        component={JobResumeCompatibility} 
+        options={{ tabBarButton: () => null }} // Hide from bottom tab bar
+      />
     </Tab.Navigator>
     <CustomSidebar />
   </SidebarProvider>

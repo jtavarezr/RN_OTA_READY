@@ -1,0 +1,37 @@
+{
+  "type": "advanced",
+  "score": 88,
+  "role": "Senior Product Designer",
+  "verdict": "Excellent Match",
+  "verdictDesc": "Candidate alignment >90% with core requirements.",
+  "summary": "This candidate demonstrates exceptional fit for the Senior Product Designer role, particularly in user-centric design methodology and cross-functional leadership. The experience gap in specific legacy tools is offset by strong adaptability.",
+  "sections": [
+    {
+      "title": "Technical Competencies",
+      "score": 92,
+      "items": [
+        { "label": "React Native & Mobile", "match": true, "desc": "5+ years confirmed experience." },
+        { "label": "System Architecture", "match": true, "desc": "Robust portfolio of scalable apps." },
+        { "label": "CI/CD Pipelines", "match": false, "desc": "Lacks specific Jenkins evidence." }
+      ]
+    },
+    {
+      "title": "Experience Level",
+      "score": 85,
+      "items": [
+        { "label": "Team Management", "match": true, "desc": "Led teams of 10+ successfully." },
+        { "label": "Domain Expertise", "match": true, "desc": "Deep FinTech background." }
+      ]
+    }
+  ],
+  "strengths": [
+    "Mastery of required tech stack",
+    "Proven leadership in similar growth stages",
+    "Clear, impact-driven communication"
+  ],
+  "improvements": [
+    "Quantify results with specific metrics",
+    "Explicitly mention CI/CD tools used",
+    "Optimize formatting for ATS parsing"
+  ]
+}
