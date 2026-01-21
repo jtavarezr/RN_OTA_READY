@@ -85,26 +85,55 @@ The server follows a standard MVC-ish pattern:
 
 We use **Docker** for containerized deployment, optimized for **Dokploy**.
 
-### 1. Domain Configuration
+### 1. Prerequisites
 
-- Main API: `backend.app.jobsprepai.com`
-- Dokploy should be configured to point this domain to the internal port `3030`.
+- A Dokploy instance running.
+- A GitHub repository with your `chatbot` branch pushed.
+- A domain pointed to your server (e.g., `backend.app.jobsprepai.com`).
 
-### 2. Deployment Steps
+### 2. Deployment Step-by-Step
 
-1. Push the code to the `chatbot` branch.
-2. In Dokploy, create a new **Compose** application pointing to the `server/`
-   directory.
-3. Add the following Environment Variables in the Dokploy dashboard:
-   - `NODE_ENV=production`
-   - `PORT=3030`
-   - `APPWRITE_ENDPOINT`
-   - `APPWRITE_PROJECT_ID`
-   - `APPWRITE_API_KEY`
-   - `GEMINI_API_KEY`
-4. Deploy.
+#### Step 1: Create a New Application
 
-### 3. Docker Maintenance
+1. In the Dokploy Dashboard, go to **Projects** and select or create a project.
+2. Click **Create Application** -> **Compose**.
+3. Name it `jobsprepai-backend`.
 
-- Review logs via `docker logs jobsprepai-backend`.
-- Restart service: `docker-compose restart`.
+#### Step 2: Configure Source
+
+1. Select **GitHub** as the source.
+2. Choose your repository and the `chatbot` branch.
+3. Set the **Base Directory** to `server` (since our Dockerfile and compose are
+   in the `server/` folder).
+
+#### Step 3: Set Environment Variables
+
+Go to the **Environment** tab and add the following keys:
+
+- `NODE_ENV`: `production`
+- `PORT`: `3030`
+- `APPWRITE_ENDPOINT`: (Your Appwrite URL)
+- `APPWRITE_PROJECT_ID`: (Your Project ID)
+- `APPWRITE_API_KEY`: (Your Server API Key)
+- `GEMINI_API_KEY`: (Your Google AI Key)
+
+#### Step 4: Configure Domain
+
+1. Go to the **Domains** tab in your application.
+2. Click **Add Domain**.
+3. Enter `backend.app.jobsprepai.com`.
+4. Set the **Container Port** to `3030`.
+5. Enable **HTTPS** (Let's Encrypt).
+
+#### Step 5: Deploy
+
+1. Go to the **Deploy** tab.
+2. Click **Deploy**. Dokploy will pull the code, build the image using the
+   `Dockerfile`, and start the container.
+
+### 3. Verification & Logs
+
+- Check logs in the **Logs** tab to ensure the server connected to Gemini and
+  Appwrite.
+- Access `https://backend.app.jobsprepai.com/api-docs` to verify Swagger is
+  running.
