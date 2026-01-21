@@ -55,7 +55,8 @@ export default {
           iosAppId: process.env.EXPO_PUBLIC_ADMOB_IOS_APP_ID || "ca-app-pub-3940256099942544~1458002511", // Test ID fallback
           userTrackingUsageDescription: "This identifier will be used to deliver personalized ads to you."
         }
-      ]
+      ],
+      "expo-audio"
     ],
     updates: {
       url: "https://ota.tavarez.dev/manifest"

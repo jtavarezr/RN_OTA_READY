@@ -18,11 +18,31 @@ const ChatModel = {
                 if (error.code === 404) {
                     logger.info(`Creating collection ${SESSIONS_COLLECTION}...`);
                     await databases.createCollection(DATABASE_ID, SESSIONS_COLLECTION, SESSIONS_COLLECTION);
-                    await databases.createStringAttribute(DATABASE_ID, SESSIONS_COLLECTION, 'userId', 50, true);
-                    await databases.createStringAttribute(DATABASE_ID, SESSIONS_COLLECTION, 'title', 100, false);
-                    await databases.createDatetimeAttribute(DATABASE_ID, SESSIONS_COLLECTION, 'lastActive', true);
-                    logger.info(`+ Session Attributes created.`);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else throw error;
+            }
+
+            // Ensure attributes exist for Sessions
+            const sessionAttrs = [
+                { key: 'userId', type: 'string', size: 50, required: true },
+                { key: 'title', type: 'string', size: 100, required: false },
+                { key: 'lastActive', type: 'datetime', required: true },
+                { key: 'interactionCount', type: 'integer', required: false, default: 0 },
+                { key: 'maxInteractions', type: 'integer', required: false, default: 1 }
+            ];
+
+            for (const attr of sessionAttrs) {
+                try {
+                    if (attr.type === 'string') {
+                        await databases.createStringAttribute(DATABASE_ID, SESSIONS_COLLECTION, attr.key, attr.size, attr.required);
+                    } else if (attr.type === 'datetime') {
+                        await databases.createDatetimeAttribute(DATABASE_ID, SESSIONS_COLLECTION, attr.key, attr.required);
+                    } else if (attr.type === 'integer') {
+                        await databases.createIntegerAttribute(DATABASE_ID, SESSIONS_COLLECTION, attr.key, attr.required, attr.default);
+                    }
+                    logger.info(`+ Session Attribute: ${attr.key}`);
+                    await new Promise(r => setTimeout(r, 100));
+                } catch (e) {
+                    if (e.code !== 409) logger.warn(`! Session Attr ${attr.key}: ${e.message}`);
                 }
             }
 
@@ -34,12 +54,28 @@ const ChatModel = {
                 if (error.code === 404) {
                     logger.info(`Creating collection ${MESSAGES_COLLECTION}...`);
                     await databases.createCollection(DATABASE_ID, MESSAGES_COLLECTION, MESSAGES_COLLECTION);
-                    await databases.createStringAttribute(DATABASE_ID, MESSAGES_COLLECTION, 'sessionId', 50, true);
-                    await databases.createStringAttribute(DATABASE_ID, MESSAGES_COLLECTION, 'role', 10, true); // 'user' or 'model'
-                    await databases.createStringAttribute(DATABASE_ID, MESSAGES_COLLECTION, 'content', 5000, true);
-                    await databases.createDatetimeAttribute(DATABASE_ID, MESSAGES_COLLECTION, 'timestamp', true);
-                    logger.info(`+ Message Attributes created.`);
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else throw error;
+            }
+
+            // Ensure attributes exist for Messages
+            const messageAttrs = [
+                { key: 'sessionId', type: 'string', size: 50, required: true },
+                { key: 'role', type: 'string', size: 10, required: true },
+                { key: 'content', type: 'string', size: 5000, required: true },
+                { key: 'timestamp', type: 'datetime', required: true }
+            ];
+
+            for (const attr of messageAttrs) {
+                try {
+                    if (attr.type === 'string') {
+                        await databases.createStringAttribute(DATABASE_ID, MESSAGES_COLLECTION, attr.key, attr.size, attr.required);
+                    } else if (attr.type === 'datetime') {
+                        await databases.createDatetimeAttribute(DATABASE_ID, MESSAGES_COLLECTION, attr.key, attr.required);
+                    }
+                    logger.info(`+ Message Attribute: ${attr.key}`);
+                    await new Promise(r => setTimeout(r, 100));
+                } catch (e) {
+                    if (e.code !== 409) logger.warn(`! Message Attr ${attr.key}: ${e.message}`);
                 }
             }
         } catch (error) {
@@ -47,11 +83,13 @@ const ChatModel = {
         }
     },
 
-    createSession: async (userId, title = 'New Conversation') => {
+    createSession: async (userId, title = 'New Conversation', maxInteractions = 1) => {
         return await databases.createDocument(DATABASE_ID, SESSIONS_COLLECTION, ID.unique(), {
             userId,
             title,
-            lastActive: new Date().toISOString()
+            lastActive: new Date().toISOString(),
+            interactionCount: 0,
+            maxInteractions
         });
     },
 
@@ -60,6 +98,23 @@ const ChatModel = {
             Query.equal('userId', userId),
             Query.orderDesc('lastActive')
         ]);
+    },
+    
+    getSession: async (sessionId) => {
+        try {
+            return await databases.getDocument(DATABASE_ID, SESSIONS_COLLECTION, sessionId);
+        } catch (error) {
+            logger.error(`Error getting session ${sessionId}:`, error);
+            return null;
+        }
+    },
+    
+    updateSessionInteractions: async (sessionId, count, maxInteractions = null) => {
+        const data = { interactionCount: count };
+        if (maxInteractions !== null) data.maxInteractions = maxInteractions;
+        data.lastActive = new Date().toISOString();
+        
+        return await databases.updateDocument(DATABASE_ID, SESSIONS_COLLECTION, sessionId, data);
     },
 
     addMessage: async (sessionId, role, content) => {

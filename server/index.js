@@ -14,6 +14,7 @@ const ServiceModel = require('./models/serviceModel');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public'));
 
 // --- Swagger Config ---
 const swaggerOptions = {
@@ -72,11 +73,19 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // --- Routes ---
 const chatRoutes = require('./routes/chatRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const ChatModel = require('./models/chatModel');
 // ...
 app.use('/api', profileRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/admin', adminRoutes);
+
+// Admin UI Route
+const path = require('path');
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 
 // Start
 const PORT = process.env.PORT || 3030;

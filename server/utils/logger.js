@@ -1,26 +1,29 @@
 const logger = {
     info: (message, meta = {}) => {
-        console.log(`[INFO] ${new Date().toISOString()} - ${message}`, Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '');
+        const timestamp = new Date().toISOString().split('T')[1].split('.')[0]; // Cleaner time
+        console.log(`🚀 [INFO] ${timestamp} - ${message}`, Object.keys(meta).length ? '\n' + JSON.stringify(meta, null, 2) : '');
     },
     error: (message, error) => {
-        console.error(`[ERROR] ${new Date().toISOString()} - ${message}`);
+        const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+        console.error(`❌ [ERROR] ${timestamp} - ${message}`);
         if (error) {
             if (error.response) {
-                // Appwrite specific error structure
-                console.error('Appwrite Error:', JSON.stringify(error.response, null, 2));
+                console.error('📦 Appwrite Detail:', JSON.stringify(error.response, null, 2));
             } else if (error.stack) {
                 console.error(error.stack);
             } else {
-                console.error(error);
+                console.error('📝 Details:', error);
             }
         }
     },
     warn: (message, meta = {}) => {
-        console.warn(`[WARN] ${new Date().toISOString()} - ${message}`, Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '');
+        const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+        console.warn(`⚠️ [WARN] ${timestamp} - ${message}`, Object.keys(meta).length ? '\n' + JSON.stringify(meta, null, 2) : '');
     },
     debug: (message, meta = {}) => {
         if (process.env.NODE_ENV !== 'production') {
-            console.log(`[DEBUG] ${new Date().toISOString()} - ${message}`, Object.keys(meta).length ? JSON.stringify(meta, null, 2) : '');
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            console.log(`🔍 [DEBUG] ${timestamp} - ${message}`, Object.keys(meta).length ? '\n' + JSON.stringify(meta, null, 2) : '');
         }
     }
 };

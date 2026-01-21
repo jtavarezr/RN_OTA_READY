@@ -43,6 +43,8 @@ styling.
 - **Axios**: HTTP Client for connecting to the custom Node.js backend
   (`/api/wallet`).
 - **Google Mobile Ads**: Monetization via Rewarded Ads.
+- **Expo Audio**: Voice messaging and processing.
+- **Expo Speech**: Text-to-Speech playback.
 - **Expo Document Picker**: File uploads (CV/Resume).
 - **i18next**: Internationalization (English/Spanish).
 
@@ -60,8 +62,8 @@ src/
 ├── navigation/         # Navigator definitions (Stack, Tab)
 ├── screens/            # Full page views
 │   ├── auth/           # Login, Register
-│   ├── main/           # Home, Profile, Dashboard
-│   └── ...
+│   ├── main/           # Home, Profile, Utility
+│   └── tools/          # AI specialized tools (CareerCoachScreen)
 ├── services/           # API wrappers
 │   ├── api.ts          # Axios instance configuration
 │   ├── walletService.ts# Wallet API endpoints
@@ -86,6 +88,14 @@ src/
   `earnCredits`.
 - **Spending**: Features like `JobResumeCompatibility` request dynamic prices
   via `prices` object in context and call `spendCredits(cost)`.
+
+### 3. AI Coach (SofIA)
+
+- **Interaction**: Users chat with SofIA via text or voice.
+- **Session**: Managed by `sessionId`. First interaction in a new session
+  deducts 1 credit and allows 5 exchanges.
+- **Voice**: `expo-audio` records voice. Audio is sent as multipart/form-data to
+  `/api/chat/audio` and processed in-memory by Gemini.
 
 ### 3. Theming
 

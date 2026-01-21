@@ -16,12 +16,17 @@ export interface Transaction {
     timestamp: string;
 }
 
+export interface ServiceInfo {
+    cost: number;
+    interactions: number;
+}
+
 export interface ReportPrices {
-    BASIC_REPORT: number;
-    ADVANCED_REPORT: number;
-    OPTIMIZED_GENERATION: number;
-    AI_IMPROVEMENT: number;
-    AI_COACH_INTERACTION: number;
+    BASIC_REPORT: ServiceInfo;
+    ADVANCED_REPORT: ServiceInfo;
+    OPTIMIZED_GENERATION: ServiceInfo;
+    AI_IMPROVEMENT: ServiceInfo;
+    AI_COACH_INTERACTION: ServiceInfo;
 }
 
 const getBalance = async (userId: string): Promise<Wallet> => {

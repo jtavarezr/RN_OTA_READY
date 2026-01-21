@@ -79,4 +79,6 @@ graph TD
 ## Current Status (Jan 2026)
 
 - **stable**: Core Wallet, Auth, and Basic CV Reports.
+- **stable**: **SofIA (AI Career Coach)** with Audio/Memory processing.
+- **stable**: **AdminPanel** for User & Service Management.
 - **in-progress**: Advanced AI Resume Analysis features.

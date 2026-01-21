@@ -21,7 +21,7 @@ const requireAuth = (client) => {
         // In a real scenario, we would verify a JWT token from the Authorization header.
         // For this bridge, we trust the userId passed in params or body, BUT we verify it exists in Appwrite.
         
-        const userId = req.params.userId || req.body.userId || req.query.userId;
+        const userId = req.params.userId || req.body?.userId || req.query.userId;
 
         if (!userId) {
             logger.warn(`Auth Failed: No userId provided for ${req.originalUrl}`);

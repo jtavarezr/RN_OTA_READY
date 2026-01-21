@@ -10,7 +10,8 @@ import {
   ViewProps,
   TextProps as RNTextProps,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { useTailwind } from '../../utils/tailwind';
@@ -19,6 +20,7 @@ import { AdBanner } from '../../components/ads/AdBanner';
 import { NativeAd } from '../../components/ads/NativeAd';
 import { NativeAdSmall } from '../../components/ads/NativeAdSmall';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
+import { useTranslation } from 'react-i18next';
 
 import { useWallet } from '../../context/WalletContext';
 import { useRewardedAd } from '../../components/ads/useRewardedAd';
@@ -152,6 +154,8 @@ const Card = ({ children, style, colors, ...props }: CardProps) => {
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 
 export const HomeScreen = () => {
+  const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   const { theme } = useTheme();
   const colors = useThemeColors();
   const tw = useTailwind();
@@ -183,10 +187,10 @@ export const HomeScreen = () => {
   const data = dataMap[activeTab];
 
   const tabs: { id: TabType; label: string; icon: IconName }[] = [
-    { id: 'overview', label: 'Overview', icon: 'apps-outline' },
-    { id: 'career',   label: 'Carrera',   icon: 'briefcase-outline' },
-    { id: 'learning', label: 'Aprendizaje', icon: 'school-outline' },
-    { id: 'community', label: 'Comunidad', icon: 'people-outline' },
+    { id: 'overview', label: t('home.overview'), icon: 'apps-outline' },
+    { id: 'career',   label: t('home.career'),   icon: 'briefcase-outline' },
+    { id: 'learning', label: t('home.learning'), icon: 'school-outline' },
+    { id: 'community', label: t('home.community'), icon: 'people-outline' },
   ];
 
   // Mini gráficos ─────────────────────────────────────────────────────────────
@@ -253,23 +257,23 @@ export const HomeScreen = () => {
       <Card colors={colors}>
         <View style={tw('flex-row justify-between items-center mb-5')}>
           <View>
-            <Text category="s1" colors={colors}>Resumen General</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>Tu progreso hoy</Text>
+            <Text category="s1" colors={colors}>{t('home.generalSummary')}</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>{t('home.todayProgress')}</Text>
           </View>
           
           {/* Wallet Balance Widget */}
           <View style={[tw('flex-row items-center px-3 py-1.5 rounded-full border'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
              <Ionicons name="wallet-outline" size={16} color={colors.primary} style={tw('mr-2')} />
-             <Text category="s2" colors={colors}>{balance} Créditos</Text>
+             <Text category="s2" colors={colors}>{t('home.credits', { count: balance })}</Text>
           </View>
 
           <CircularProgress percent={d.profile} />
         </View>
         <View style={[tw('flex-row justify-around pt-4 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
-            { value: d.apps, label: 'Aplicaciones', color: colors.warning },
-            { value: d.interviews, label: 'Entrevistas', color: colors.success },
-            { value: d.matches, label: 'Matches', color: colors.primary },
+            { value: d.apps, label: t('home.applications'), color: colors.warning },
+            { value: d.interviews, label: t('home.interviews'), color: colors.success },
+            { value: d.matches, label: t('home.matches'), color: colors.primary },
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
@@ -287,20 +291,20 @@ export const HomeScreen = () => {
       <Card colors={colors}>
         <View style={tw('flex-row justify-between mb-4')}>
           <View>
-            <Text category="s1" colors={colors}>Actividad Carrera</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>Últimos 7 días</Text>
+            <Text category="s1" colors={colors}>{t('home.careerActivity')}</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>{t('home.last7Days')}</Text>
           </View>
           <View style={tw('items-end')}>
             <Text category="h5" colors={colors} style={{ color: colors.primary }}>{d.rate}%</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs')}>Respuesta</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs')}>{t('home.response')}</Text>
           </View>
         </View>
         <MiniBar data={d.weekly} color={colors.primary} />
         <View style={[tw('flex-row justify-around pt-4 mt-2 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
-            { value: d.active, label: 'Activas', color: colors.warning },
-            { value: d.interviews, label: 'Entrevistas', color: colors.success },
-            { value: d.offers, label: 'Ofertas', color: colors.primary },
+            { value: d.active, label: t('home.active'), color: colors.warning },
+            { value: d.interviews, label: t('home.interviews'), color: colors.success },
+            { value: d.offers, label: t('home.offers'), color: colors.primary },
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
@@ -318,27 +322,27 @@ export const HomeScreen = () => {
       <Card colors={colors}>
         <View style={tw('flex-row justify-between mb-4')}>
           <View>
-            <Text category="s1" colors={colors}>Progreso Aprendizaje</Text>
+            <Text category="s1" colors={colors}>{t('home.learningProgress')}</Text>
             <View style={tw('flex-row items-center mt-1')}>
               <Ionicons name="flame" size={14} color={colors.warning} />
               <Text colors={colors} style={tw('ml-1.5 text-xs font-semibold text-yellow-500')}>
-                Racha {d.streak} días
+                {t('home.streak', { count: d.streak })}
               </Text>
             </View>
           </View>
           <View style={tw('items-end')}>
             <Text category="h5" colors={colors} style={{ color: colors.success }}>{d.hours}h</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs')}>Total</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs')}>{t('home.total')}</Text>
           </View>
         </View>
         <MiniLine data={d.progress} color={colors.success} />
         <Text appearance="hint" colors={colors} style={tw('text-xs mt-2 text-center')}>
-          Progreso últimos 5 cursos
+          {t('home.last5Courses')}
         </Text>
         <View style={[tw('flex-row justify-around pt-4 mt-3 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
-            { value: d.inProgress, label: 'En progreso', color: '#8b5cf6' },
-            { value: d.completed, label: 'Completados', color: colors.success },
+            { value: d.inProgress, label: t('home.inProgress'), color: '#8b5cf6' },
+            { value: d.completed, label: t('home.completed'), color: colors.success },
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
@@ -356,20 +360,20 @@ export const HomeScreen = () => {
       <Card colors={colors}>
         <View style={tw('flex-row justify-between mb-4')}>
           <View>
-            <Text category="s1" colors={colors}>Actividad Comunitaria</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>Última semana</Text>
+            <Text category="s1" colors={colors}>{t('home.communityActivity')}</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>{t('home.lastWeek')}</Text>
           </View>
           <View style={tw('items-end')}>
             <Text category="h5" colors={colors} style={{ color: colors.reputation }}>{d.rep}</Text>
-            <Text appearance="hint" colors={colors} style={tw('text-xs')}>Reputación</Text>
+            <Text appearance="hint" colors={colors} style={tw('text-xs')}>{t('home.reputation')}</Text>
           </View>
         </View>
         <MiniBar data={d.activity} color={colors.reputation} />
         <View style={[tw('flex-row justify-around pt-4 mt-2 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
-            { value: d.posts, label: 'Posts', color: colors.reputation },
-            { value: d.helpful, label: 'Útiles', color: colors.success },
-            { value: d.followers, label: 'Seguidores', color: colors.primary },
+            { value: d.posts, label: t('home.posts'), color: colors.reputation },
+            { value: d.helpful, label: t('home.helpful'), color: colors.success },
+            { value: d.followers, label: t('home.followers'), color: colors.primary },
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
@@ -432,7 +436,7 @@ export const HomeScreen = () => {
 
         {/* Featured Ad */}
         <View style={tw('mb-4')}>
-          <Text category="label" appearance="hint" colors={colors} style={tw('mb-2')}>PATROCINADO</Text>
+          <Text category="label" appearance="hint" colors={colors} style={tw('mb-2')}>{t('home.sponsored')}</Text>
           <NativeAd />
           
           {/* TEST REWARD BUTTON */}
@@ -441,7 +445,7 @@ export const HomeScreen = () => {
                 if (loaded) {
                     showRewarded();
                 } else {
-                    alert('Ad not loaded yet. Please wait...');
+                    alert(t('home.adNotLoaded'));
                 }
             }}
             style={[
@@ -455,7 +459,7 @@ export const HomeScreen = () => {
              <View style={tw('flex-row items-center')}>
                 <Ionicons name={loaded ? "play-circle" : "time-outline"} size={20} color={loaded ? "white" : colors.textSecondary} style={tw('mr-2')} />
                 <Text category="s1" style={{ color: loaded ? 'white' : colors.textSecondary }}>
-                    {loaded ? 'Obtener Puntos (+1 Crédito)' : 'Cargando Anuncio...'}
+                    {loaded ? t('home.getPoints') : t('home.loadingAd')}
                 </Text>
              </View>
           </TouchableOpacity>
@@ -463,16 +467,17 @@ export const HomeScreen = () => {
 
         {/* Quick Access */}
         <View style={tw('mb-6')}>
-          <Text category="label" appearance="hint" colors={colors} style={tw('mb-3')}>ACCESO RÁPIDO</Text>
+          <Text category="label" appearance="hint" colors={colors} style={tw('mb-3')}>{t('home.quickAccess')}</Text>
           <View style={tw('flex-row flex-wrap justify-between')}>
             {[
-              { icon: 'document-text-outline', title: 'CV Builder', sub: 'Crea tu currículum', color: '#6366f1', bg: 'rgba(99,102,241,0.15)' },
-              { icon: 'mic-outline', title: 'Mock Interview', sub: '3 pendientes', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' },
-              { icon: 'briefcase-outline', title: 'Job Board', sub: '42 nuevas ofertas', color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
-              { icon: 'school-outline', title: 'Cursos', sub: '60% completado', color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)' },
+              { icon: 'sparkles-outline', title: t('home.sofia'), sub: t('home.sofiaSub'), color: '#6366f1', bg: 'rgba(99,102,241,0.15)', screen: 'CareerCoach' },
+              { icon: 'document-attach-outline', title: t('home.compatibility'), sub: t('home.compatibilitySub'), color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', screen: 'JobResumeCompatibility' },
+              { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+              { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)' },
             ].map((m, i) => (
               <TouchableOpacity
                 key={i}
+                onPress={() => m.screen && navigation.navigate(m.screen)}
                 style={[
                   tw('rounded-2xl p-4 items-center mb-4'),
                   shadow.metric,
@@ -492,8 +497,8 @@ export const HomeScreen = () => {
             <NativeAdSmall style={{ width: (width - 48) / 2 }} />
 
             {[
-              { icon: 'chatbubbles-outline', title: 'Foro', sub: '24 temas activos', color: '#ec4899', bg: 'rgba(236,72,153,0.15)' },
-              { icon: 'flash-outline', title: 'Flashcards', sub: 'Practica ahora', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
+              { icon: 'chatbubbles-outline', title: t('home.forum'), sub: t('home.forumSub'), color: '#ec4899', bg: 'rgba(236,72,153,0.15)' },
+              { icon: 'flash-outline', title: t('home.flashcards'), sub: t('home.flashcardsSub'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
             ].map((m, i) => (
               <TouchableOpacity
                 key={`second-${i}`}
@@ -515,16 +520,16 @@ export const HomeScreen = () => {
 
         {/* Recommended Course Featured Ad */}
         <View style={tw('mb-4')}>
-          <Text category="label" appearance="hint" colors={colors} style={tw('mb-2')}>PATROCINADO</Text>
+          <Text category="label" appearance="hint" colors={colors} style={tw('mb-2')}>{t('home.sponsored')}</Text>
           <NativeAd />
         </View>
         {/* Recent Activity */}
         <View style={tw('mb-6')}>
-          <Text category="label" appearance="hint" colors={colors} style={tw('mb-3')}>ACTIVIDAD RECIENTE</Text>
+          <Text category="label" appearance="hint" colors={colors} style={tw('mb-3')}>{t('home.recentActivity')}</Text>
           {[
-            { icon: 'checkmark-circle', color: colors.success, title: 'Aplicación enviada', sub: 'Software Engineer en Meta', time: 'Hace 2h' },
-            { icon: 'chatbubble', color: colors.primary, title: 'Nuevo mensaje', sub: 'María comentó en tu publicación', time: 'Hace 4h' },
-            { icon: 'trophy', color: colors.warning, title: 'Logro desbloqueado', sub: 'Completaste 10 entrevistas mock', time: 'Hace 1d' },
+            { icon: 'checkmark-circle', color: colors.success, title: t('home.appSent'), sub: t('home.softwareEngineer'), time: t('home.time2h') },
+            { icon: 'chatbubble', color: colors.primary, title: t('home.newMessage'), sub: t('home.mariaComment'), time: t('home.time4h') },
+            { icon: 'trophy', color: colors.warning, title: t('home.achievementUnlocked'), sub: t('home.completed10Interviews'), time: t('home.time1d') },
           ].map((act, i) => (
             <View
               key={i}

@@ -107,8 +107,8 @@ export const JobResumeCompatibility = () => {
     if (!hasJob || !hasResume) return;
 
     // Determine Cost
-    const costBasic = prices?.BASIC_REPORT ?? 1;
-    const costAdvanced = prices?.ADVANCED_REPORT ?? 2;
+    const costBasic = prices?.BASIC_REPORT?.cost ?? 1;
+    const costAdvanced = prices?.ADVANCED_REPORT?.cost ?? 2;
     const cost = reportType === 'advanced' ? costAdvanced : costBasic;
 
     // Debug Logs
@@ -279,7 +279,7 @@ export const JobResumeCompatibility = () => {
                 ]}
               >
                 <Text style={styles.btnText}>
-                  {step === 1 ? t('jobResume.actions.next') : step === 2 ? `Pay & Analyze (${reportType === 'advanced' ? (prices?.ADVANCED_REPORT ?? 2) : (prices?.BASIC_REPORT ?? 1)} Credits)` : t('jobResume.actions.share')}
+                  {step === 1 ? t('jobResume.actions.next') : step === 2 ? `Pay & Analyze (${reportType === 'advanced' ? (prices?.ADVANCED_REPORT?.cost ?? 2) : (prices?.BASIC_REPORT?.cost ?? 1)} Credits)` : t('jobResume.actions.share')}
                 </Text>
                 {step < 3 && <Ionicons name="arrow-forward" size={18} color="white" style={tw('ml-2')} />}
                 {step === 3 && <Ionicons name="share-social" size={18} color="white" style={tw('ml-2')} />}

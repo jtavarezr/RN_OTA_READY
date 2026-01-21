@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobsPrepAI - Admin Backend</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg: #0b0f1a;
+            --sidebar: #111827;
+            --card: #1f2937;
+            --card-hover: #374151;
+            --border: #2d3748;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styles */
+        aside {
+            width: 260px;
+            background-color: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .logo i { color: var(--primary); }
+        .logo span {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--glass);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            color: var(--primary-light);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent);
+        }
+
+        header {
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background: rgba(11, 15, 26, 0.8);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .header-left h1 { margin: 0; font-size: 24px; font-weight: 600; }
+        .header-left p { margin: 4px 0 0; color: var(--text-muted); font-size: 14px; }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--sidebar);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 16px 10px 40px;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus { border-color: var(--primary); }
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            width: 16px;
+        }
+
+        .content-area { padding: 40px; }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-info h3 { margin: 0; font-size: 28px; font-weight: 700; color: var(--text-main); }
+        .stat-info p { margin: 4px 0 0; color: var(--text-muted); font-size: 14px; }
+
+        /* Table Styles */
+        .table-container {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th {
+            text-align: left;
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.01); }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.1); color: var(--secondary); }
+        .badge-warning { background: rgba(245, 158, 11, 0.1); color: var(--accent); }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--border);
+        }
+
+        .pagination-info { font-size: 14px; color: var(--text-muted); }
+        .pagination-btns { display: flex; gap: 8px; }
+
+        .btn-page {
+            background: var(--sidebar);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .btn-page:hover:not(:disabled) { border-color: var(--primary); color: var(--primary-light); }
+        .btn-page:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Modal / Edit Overlay */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 450px;
+            padding: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .modal-header h2 { margin: 0; font-size: 20px; }
+        .modal-header button { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-muted); }
+        .form-group input {
+            width: 100%;
+            background: var(--sidebar);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: var(--text-main);
+            outline: none;
+        }
+
+        .form-group input:focus { border-color: var(--primary); }
+
+        .btn-save {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover { background: var(--primary-dark); }
+
+        .action-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; transition: color 0.2s; }
+        .action-btn:hover { color: var(--primary-light); }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="logo">
+            <i data-lucide="zap" size="28"></i>
+            <span>JobsPrepAI</span>
+        </div>
+        <nav>
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <i data-lucide="layout-dashboard" size="18"></i>
+                Dashboard
+            </div>
+            <div class="nav-item" onclick="switchTab('users')">
+                <i data-lucide="users" size="18"></i>
+                User Management
+            </div>
+            <div class="nav-item" onclick="switchTab('services')">
+                <i data-lucide="settings" size="18"></i>
+                Service Config
+            </div>
+        </nav>
+        <div class="nav-item" style="margin-top: auto;">
+            <i data-lucide="log-out" size="18"></i>
+            Logout
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-left">
+                <h1 id="page-title">Admin Dashboard</h1>
+                <p id="page-subtitle">Overview of your AI platform performance.</p>
+            </div>
+            <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" id="search-input" placeholder="Search users by email..." onkeyup="handleSearch(event)">
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Dashboard View -->
+            <div id="dashboard-view">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--primary);">
+                            <i data-lucide="user-plus"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-users">--</h3>
+                            <p>Total Registered Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--secondary);">
+                            <i data-lucide="wallet"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-credits">--</h3>
+                            <p>Global Credits Issued</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div style="padding: 24px; display: flex; justify-content: space-between; align-items: center;">
+                        <h2 style="font-size: 18px; margin: 0;">Recent Users</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-page" onclick="fetchData()">Refresh</button>
+                            <button class="btn-page" onclick="switchTab('users')">View All</button>
+                        </div>
+                    </div>
+                    <table id="recent-users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Credits</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users View -->
+            <div id="users-view" style="display: none;">
+                <div class="table-container">
+                    <table id="full-users-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Credits</th>
+                                <th>Status</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <div class="pagination">
+                        <div class="pagination-info" id="pagination-info">Page 1 of 1 (0 users)</div>
+                        <div class="pagination-btns">
+                            <button class="btn-page" id="prev-btn" onclick="changePage(-1)">Previous</button>
+                            <button class="btn-page" id="next-btn" onclick="changePage(1)">Next</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services View -->
+            <div id="services-view" style="display: none;">
+                <div class="table-container">
+                    <table id="services-table">
+                        <thead>
+                            <tr>
+                                <th>Slug</th>
+                                <th>Service Name</th>
+                                <th>Cost (Credits)</th>
+                                <th>Interactions</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- User Edit Modal -->
+    <div class="modal" id="user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit User Details</h2>
+                <button onclick="closeModal('user-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <input type="hidden" id="edit-user-id">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="edit-user-name">
+            </div>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="edit-user-email">
+            </div>
+            <div class="form-group">
+                <label>Credits Balance</label>
+                <input type="number" id="edit-user-balance">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <label style="margin-bottom: 0;">Account Active</label>
+                <input type="checkbox" id="edit-user-status" style="width: auto;">
+            </div>
+            <button class="btn-save" onclick="saveUserChanges()">Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Service Edit Modal -->
+    <div class="modal" id="service-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Service Pricing</h2>
+                <button onclick="closeModal('service-modal')"><i data-lucide="x"></i></button>
+            </div>
+            <input type="hidden" id="edit-service-slug">
+            <div class="form-group">
+                <label>Service Cost (Credits)</label>
+                <input type="number" id="edit-service-cost">
+            </div>
+            <div class="form-group">
+                <label>Interactions per Credit</label>
+                <input type="number" id="edit-service-int">
+            </div>
+            <button class="btn-save" onclick="saveServiceChanges()">Update Service</button>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        let searchQuery = '';
+        let currentTab = 'dashboard';
+        let allData = null;
+
+        async function fetchData(page = 1, search = '') {
+            console.log("Fetching data...");
+            try {
+                const url = `/api/admin/dashboard?page=${page}&limit=10&search=${search}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                allData = data;
+                if (data.error) {
+                    console.error("Server Side Error:", data.error);
+                }
+                renderDashboard(data);
+                renderUsers(data);
+                renderServices(data);
+                lucide.createIcons();
+            } catch (err) {
+                console.error("Fetch Error", err);
+            }
+        }
+
+        function renderDashboard(data) {
+            document.getElementById('stat-total-users').innerText = data.totalUsers || 0;
+            const users = data.users || [];
+            const totalCredits = users.reduce((acc, u) => acc + (parseInt(u.balance) || 0), 0);
+            document.getElementById('stat-total-credits').innerText = totalCredits;
+
+            const tbody = document.querySelector('#recent-users-table tbody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">No users found</td></tr>';
+                return;
+            }
+            tbody.innerHTML = users.slice(0, 5).map(u => `
+                <tr>
+                    <td>${u.name || 'Anonymous'}</td>
+                    <td>${u.email}</td>
+                    <td><strong>${u.balance}</strong></td>
+                    <td><span class="badge ${u.status ? 'badge-success' : 'badge-warning'}">${u.status ? 'Active' : 'Pending'}</span></td>
+                    <td>${new Date(u.registration).toLocaleDateString()}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderUsers(data) {
+            const tbody = document.querySelector('#full-users-table tbody');
+            const users = data.users || [];
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 40px; color: var(--text-muted);">No users matching your criteria</td></tr>';
+            } else {
+                tbody.innerHTML = users.map(u => `
+                <tr>
+                    <td>${u.name || 'Anonymous'}</td>
+                    <td>${u.email}</td>
+                    <td><strong>${u.balance}</strong></td>
+                    <td><span class="badge ${u.status ? 'badge-success' : 'badge-warning'}">${u.status ? 'Active' : 'Pending'}</span></td>
+                    <td>${new Date(u.registration).toLocaleDateString()}</td>
+                    <td>
+                        <button class="action-btn" onclick="openUserEdit('${u.id}', '${u.name}', '${u.email}', ${u.balance}, ${u.status})">
+                            <i data-lucide="edit-3" size="16"></i>
+                        </button>
+                        <button class="action-btn" title="${u.status ? 'Disable' : 'Enable'}" onclick="toggleUserDirectly('${u.id}', ${!u.status})">
+                            <i data-lucide="${u.status ? 'user-minus' : 'user-check'}" size="16" style="color: ${u.status ? 'var(--danger)' : 'var(--secondary)'}"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            }
+
+            document.getElementById('pagination-info').innerText = `Page ${data.currentPage} of ${data.totalPages} (${data.totalUsers} users)`;
+            document.getElementById('prev-btn').disabled = data.currentPage === 1;
+            document.getElementById('next-btn').disabled = data.currentPage === data.totalPages || data.totalPages === 0;
+        }
+
+        function renderServices(data) {
+            const tbody = document.querySelector('#services-table tbody');
+            tbody.innerHTML = data.services.map(s => `
+                <tr>
+                    <td><code>${s.slug}</code></td>
+                    <td>${s.name}</td>
+                    <td><strong>${s.cost}</strong></td>
+                    <td>${s.interactions || 1}</td>
+                    <td>
+                        <button class="action-btn" onclick="openServiceEdit('${s.slug}', ${s.cost}, ${s.interactions || 1})">
+                            <i data-lucide="settings-2" size="16"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.querySelector(`.nav-item[onclick="switchTab('${tab}')"]`).classList.add('active');
+
+            document.getElementById('dashboard-view').style.display = tab === 'dashboard' ? 'block' : 'none';
+            document.getElementById('users-view').style.display = tab === 'users' ? 'block' : 'none';
+            document.getElementById('services-view').style.display = tab === 'services' ? 'block' : 'none';
+
+            const title = { dashboard: 'Admin Dashboard', users: 'User Management', services: 'Service Configurations' };
+            const subtitle = { dashboard: 'Overview of platform performance', users: 'List of all users with search and filter', services: 'Manage credit costs and interaction limits' };
+            
+            document.getElementById('page-title').innerText = title[tab];
+            document.getElementById('page-subtitle').innerText = subtitle[tab];
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter' || e.target.value === '') {
+                searchQuery = e.target.value;
+                currentPage = 1;
+                fetchData(currentPage, searchQuery);
+                if (currentTab !== 'users' && searchQuery !== '') switchTab('users');
+            }
+        }
+
+        function changePage(delta) {
+            currentPage += delta;
+            fetchData(currentPage, searchQuery);
+        }
+
+        // Modals
+        function openUserEdit(id, name, email, balance, status) {
+            document.getElementById('edit-user-id').value = id;
+            document.getElementById('edit-user-name').value = name;
+            document.getElementById('edit-user-email').value = email;
+            document.getElementById('edit-user-balance').value = balance;
+            document.getElementById('edit-user-status').checked = status;
+            document.getElementById('user-modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function openServiceEdit(slug, cost, interactions) {
+            document.getElementById('edit-service-slug').value = slug;
+            document.getElementById('edit-service-cost').value = cost;
+            document.getElementById('edit-service-int').value = interactions;
+            document.getElementById('service-modal').classList.add('active');
+            lucide.createIcons();
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        async function saveUserChanges() {
+            const userId = document.getElementById('edit-user-id').value;
+            const name = document.getElementById('edit-user-name').value;
+            const email = document.getElementById('edit-user-email').value;
+            const balance = document.getElementById('edit-user-balance').value;
+            const status = document.getElementById('edit-user-status').checked;
+
+            try {
+                // Update User Details
+                await fetch('/api/admin/user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, name, email })
+                });
+                // Update Wallet
+                await fetch('/api/admin/wallet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, balance })
+                });
+                // Update Status
+                await fetch('/api/admin/status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, status })
+                });
+                
+                closeModal('user-modal');
+                fetchData(currentPage, searchQuery);
+            } catch (err) { alert("Error saving changes"); }
+        }
+
+        async function toggleUserDirectly(userId, status) {
+            try {
+                await fetch('/api/admin/status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId, status })
+                });
+                fetchData(currentPage, searchQuery);
+            } catch (err) { alert("Error toggling user status"); }
+        }
+
+        async function saveServiceChanges() {
+            const slug = document.getElementById('edit-service-slug').value;
+            const cost = document.getElementById('edit-service-cost').value;
+            const interactions = document.getElementById('edit-service-int').value;
+
+            try {
+                await fetch('/api/admin/service', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ slug, cost, interactions })
+                });
+                closeModal('service-modal');
+                fetchData(currentPage, searchQuery);
+            } catch (err) { alert("Error saving service"); }
+        }
+
+        fetchData();
+        lucide.createIcons();
+    </script>
+</body>
+</html>

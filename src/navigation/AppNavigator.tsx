@@ -40,7 +40,7 @@ const BottomTabBar = ({ navigation, state }: any) => {
             selectedIndex={state.index}
             onSelect={index => navigation.navigate(state.routeNames[index])}
         >
-            <BottomNavigationTab title={t('home')} icon={(props) => <Icon {...props} name='home-outline'/>} />
+            <BottomNavigationTab title={t('home.title')} icon={(props) => <Icon {...props} name='home-outline'/>} />
             <BottomNavigationTab title={t('utility')} icon={(props) => <Icon {...props} name='grid-outline'/>} />
             <BottomNavigationTab title={t('profile')} icon={(props) => <Icon {...props} name='person-outline'/>} />
             <BottomNavigationTab title={t('settings')} icon={(props) => <Icon {...props} name='settings-outline'/>} />
