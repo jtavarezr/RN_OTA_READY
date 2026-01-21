@@ -26,7 +26,8 @@ export default {
         foregroundImage: "./assets/app_Icon_bot.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.jobsprepai.app.v1"
+      package: "com.jobsprepai.app.v1",
+      softwareKeyboardLayoutMode: "resize"
     },
     web: {
       favicon: "./assets/app_Icon_bot.png"

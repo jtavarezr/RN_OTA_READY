@@ -21,6 +21,7 @@ export interface ReportPrices {
     ADVANCED_REPORT: number;
     OPTIMIZED_GENERATION: number;
     AI_IMPROVEMENT: number;
+    AI_COACH_INTERACTION: number;
 }
 
 const getBalance = async (userId: string): Promise<Wallet> => {

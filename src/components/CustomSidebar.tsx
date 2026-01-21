@@ -92,6 +92,7 @@ export const CustomSidebar = () => {
       title: 'Career Tools',
       items: [
         { label: 'Job & Resume compatibility', icon: 'analytics-outline', screen: 'JobResumeCompatibility' },
+        { label: 'AI Career Coach', icon: 'chatbubbles-outline', screen: 'CareerCoach' },
       ]
     }
   ];

@@ -13,6 +13,7 @@ import { SettingsScreen } from '../screens/main/SettingsScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { JobResumeCompatibility } from '../components/CVBuilderAndTools/JobResumeCompatibility';
+import { CareerCoachScreen } from '../screens/tools/CareerCoachScreen';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/AppHeader';
@@ -65,7 +66,12 @@ const MainTabs = () => (
       <Tab.Screen 
         name="JobResumeCompatibility" 
         component={JobResumeCompatibility} 
-        options={{ tabBarButton: () => null }} // Hide from bottom tab bar
+        options={{ tabBarButton: () => null }} 
+      />
+      <Tab.Screen 
+        name="CareerCoach" 
+        component={CareerCoachScreen} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
       />
     </Tab.Navigator>
     <CustomSidebar />

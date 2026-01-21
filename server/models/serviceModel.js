@@ -11,6 +11,8 @@ const ServiceModel = {
         try {
             await databases.getCollection(DATABASE_ID, COLLECTION_ID);
             logger.info(`✓ Collection ${COLLECTION_ID} found.`);
+            // Ensure defaults exist even if collection exists
+            await ServiceModel.seedDefaults();
         } catch (error) {
             if (error.code === 404) {
                 logger.info(`Creating collection ${COLLECTION_ID}...`);
@@ -37,7 +39,8 @@ const ServiceModel = {
             { slug: 'BASIC_REPORT', name: 'Reporte Básico', cost: 1 },
             { slug: 'ADVANCED_REPORT', name: 'Reporte Avanzado', cost: 2 },
             { slug: 'OPTIMIZED_GENERATION', name: 'Generación Optimizada (Pro)', cost: 20 },
-            { slug: 'AI_IMPROVEMENT', name: 'Mejora con IA', cost: 1 }
+            { slug: 'AI_IMPROVEMENT', name: 'Mejora con IA', cost: 1 },
+            { slug: 'AI_COACH_INTERACTION', name: 'Consulta Coach IA', cost: 1 }
         ];
 
         for (const service of defaults) {

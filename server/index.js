@@ -71,8 +71,12 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // --- Routes ---
+const chatRoutes = require('./routes/chatRoutes');
+const ChatModel = require('./models/chatModel');
+// ...
 app.use('/api', profileRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Start
 const PORT = process.env.PORT || 3030;
@@ -81,7 +85,8 @@ if (process.env.NODE_ENV !== 'test') {
         ProfileModel.setupDatabase(),
         WalletModel.setupDatabase(),
         TransactionModel.setupDatabase(),
-        ServiceModel.setupDatabase()
+        ServiceModel.setupDatabase(),
+        ChatModel.setupDatabase()
     ]).then(() => {
         app.listen(PORT, () => {
             console.log(`Server running at http://localhost:${PORT}`);
