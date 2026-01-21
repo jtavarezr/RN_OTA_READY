@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
@@ -20,6 +20,8 @@ import { NativeAd } from '../../components/ads/NativeAd';
 import { NativeAdSmall } from '../../components/ads/NativeAdSmall';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 
+import { useWallet } from '../../context/WalletContext';
+import { useRewardedAd } from '../../components/ads/useRewardedAd';
 import { useThemeColors, ThemeColors } from '../../utils/themeColors';
 
 const { width } = Dimensions.get('window');
@@ -153,6 +155,21 @@ export const HomeScreen = () => {
   const { theme } = useTheme();
   const colors = useThemeColors();
   const tw = useTailwind();
+  const { balance, earnCredits } = useWallet(); // Wallet integration
+  
+  // Ad Integration
+  const { loaded, showRewarded, reward } = useRewardedAd();
+
+  useEffect(() => {
+    if (reward) {
+        // In a real app, you'd use the server-side callback, but here we can trigger it manually for testing
+        // or rely on the hook if it returned a signature. 
+        // For this demo, we assume the hook's reward event is trusted enough to trigger our backend "earn"
+        // Note: The WalletProvider's earnCredits uses a mock token currently.
+        earnCredits('VALID_AD_TOKEN');
+        alert('Reward Earned! +1 Credit');
+    }
+  }, [reward]);
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
@@ -239,6 +256,13 @@ export const HomeScreen = () => {
             <Text category="s1" colors={colors}>Resumen General</Text>
             <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>Tu progreso hoy</Text>
           </View>
+          
+          {/* Wallet Balance Widget */}
+          <View style={[tw('flex-row items-center px-3 py-1.5 rounded-full border'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
+             <Ionicons name="wallet-outline" size={16} color={colors.primary} style={tw('mr-2')} />
+             <Text category="s2" colors={colors}>{balance} Créditos</Text>
+          </View>
+
           <CircularProgress percent={d.profile} />
         </View>
         <View style={[tw('flex-row justify-around pt-4 border-t'), { borderTopColor: colors.cardBorder }]}>
@@ -410,6 +434,31 @@ export const HomeScreen = () => {
         <View style={tw('mb-4')}>
           <Text category="label" appearance="hint" colors={colors} style={tw('mb-2')}>PATROCINADO</Text>
           <NativeAd />
+          
+          {/* TEST REWARD BUTTON */}
+          <TouchableOpacity 
+            onPress={() => {
+                if (loaded) {
+                    showRewarded();
+                } else {
+                    alert('Ad not loaded yet. Please wait...');
+                }
+            }}
+            style={[
+                tw('mt-4 py-3 rounded-xl items-center justify-center border'), 
+                { 
+                    backgroundColor: loaded ? colors.primary : colors.card,
+                    borderColor: loaded ? colors.primary : colors.cardBorder
+                }
+            ]}
+          >
+             <View style={tw('flex-row items-center')}>
+                <Ionicons name={loaded ? "play-circle" : "time-outline"} size={20} color={loaded ? "white" : colors.textSecondary} style={tw('mr-2')} />
+                <Text category="s1" style={{ color: loaded ? 'white' : colors.textSecondary }}>
+                    {loaded ? 'Obtener Puntos (+1 Crédito)' : 'Cargando Anuncio...'}
+                </Text>
+             </View>
+          </TouchableOpacity>
         </View>
 
         {/* Quick Access */}

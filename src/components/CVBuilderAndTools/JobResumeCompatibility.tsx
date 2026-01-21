@@ -21,6 +21,7 @@ import { BasicReport } from './reports/BasicReport';
 import { AdvancedReport } from './reports/AdvancedReport';
 import basicReportData from '../../data/reports/basicReport.json';
 import advancedReportData from '../../data/reports/advancedReport.json';
+import { useWallet } from '../../context/WalletContext';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 type ReportType = 'basic' | 'advanced';
@@ -30,6 +31,8 @@ export const JobResumeCompatibility = () => {
   const colors = useThemeColors();
   const tw = useTailwind();
   const { loaded, showRewarded, reward } = useRewardedAd();
+  // Wallet Hook
+  const { balance, spendCredits, prices } = useWallet();
   const scrollViewRef = useRef<ScrollView>(null);
 
   const [step, setStep] = useState(1);
@@ -98,14 +101,32 @@ export const JobResumeCompatibility = () => {
 
   useEffect(() => { if (reward) startAnalysis(); }, [reward]);
 
-  const handleEvaluate = () => {
+  const handleEvaluate = async () => {
     const hasJob = jobInputType === 'text' ? !!jobDescription : !!jobFile;
     const hasResume = resumeInputType === 'text' ? !!resumeText : !!resumeFile;
     if (!hasJob || !hasResume) return;
 
-    // For Basic report, maybe skip ads or show interstitial? 
-    // For now, consistent behavior: load ad if available
-    loaded ? showRewarded() : startAnalysis();
+    // Determine Cost
+    const costBasic = prices?.BASIC_REPORT ?? 1;
+    const costAdvanced = prices?.ADVANCED_REPORT ?? 2;
+    const cost = reportType === 'advanced' ? costAdvanced : costBasic;
+
+    // Debug Logs
+    console.log('DEBUG: ReportType:', reportType);
+    console.log('DEBUG: Prices from Context:', prices);
+    console.log('DEBUG: Calculated Cost:', cost);
+
+    if (balance < cost) {
+        alert(`DEBUG CHECK: Required: ${cost}, Available: ${balance}. Should be 1 for basic.`);
+        return;
+    }
+
+    const success = await spendCredits(cost, `Generated ${reportType} CV Report`);
+    if (success) {
+        startAnalysis();
+    } else {
+        alert("Transaction failed. Please try again.");
+    }
   };
 
   const renderStepper = () => (
@@ -258,7 +279,7 @@ export const JobResumeCompatibility = () => {
                 ]}
               >
                 <Text style={styles.btnText}>
-                  {step === 1 ? t('jobResume.actions.next') : step === 2 ? t('jobResume.actions.analyze') : t('jobResume.actions.share')}
+                  {step === 1 ? t('jobResume.actions.next') : step === 2 ? `Pay & Analyze (${reportType === 'advanced' ? (prices?.ADVANCED_REPORT ?? 2) : (prices?.BASIC_REPORT ?? 1)} Credits)` : t('jobResume.actions.share')}
                 </Text>
                 {step < 3 && <Ionicons name="arrow-forward" size={18} color="white" style={tw('ml-2')} />}
                 {step === 3 && <Ionicons name="share-social" size={18} color="white" style={tw('ml-2')} />}

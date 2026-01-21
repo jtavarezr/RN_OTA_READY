@@ -5,6 +5,7 @@ import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider } from './src/context/AuthContext';
+import { WalletProvider } from './src/context/WalletContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { useSettingsStore } from './src/context/SettingsStore';
 import { AppNavigator } from './src/navigation/AppNavigator';
@@ -66,7 +67,9 @@ export default function App() {
       <TailwindProvider utilities={utilities}>
         <ThemeProvider>
           <AuthProvider>
-            <AppContent />
+            <WalletProvider>
+              <AppContent />
+            </WalletProvider>
           </AuthProvider>
         </ThemeProvider>
       </TailwindProvider>

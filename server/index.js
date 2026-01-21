@@ -5,7 +5,11 @@ const swaggerJsdoc = require('swagger-jsdoc');
 require('dotenv').config();
 
 const profileRoutes = require('./routes/profileRoutes');
+const walletRoutes = require('./routes/walletRoutes');
 const ProfileModel = require('./models/profileModel');
+const WalletModel = require('./models/walletModel');
+const TransactionModel = require('./models/transactionModel');
+const ServiceModel = require('./models/serviceModel');
 
 const app = express();
 app.use(cors());
@@ -68,11 +72,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // --- Routes ---
 app.use('/api', profileRoutes);
+app.use('/api/wallet', walletRoutes);
 
 // Start
 const PORT = process.env.PORT || 3030;
 if (process.env.NODE_ENV !== 'test') {
-    ProfileModel.setupDatabase().then(() => {
+    Promise.all([
+        ProfileModel.setupDatabase(),
+        WalletModel.setupDatabase(),
+        TransactionModel.setupDatabase(),
+        ServiceModel.setupDatabase()
+    ]).then(() => {
         app.listen(PORT, () => {
             console.log(`Server running at http://localhost:${PORT}`);
             console.log(`Swagger at http://localhost:${PORT}/api-docs`);
