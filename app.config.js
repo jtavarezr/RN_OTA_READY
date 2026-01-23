@@ -56,7 +56,11 @@ export default {
           userTrackingUsageDescription: "This identifier will be used to deliver personalized ads to you."
         }
       ],
-      "expo-audio"
+      [  "expo-audio",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone."
+        }
+      ]
     ],
     updates: {
       url: "https://ota.tavarez.dev/manifest"

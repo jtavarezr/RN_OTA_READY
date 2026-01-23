@@ -93,6 +93,8 @@ export const CustomSidebar = () => {
       items: [
         { label: t('jobResume.title'), icon: 'analytics-outline', screen: 'JobResumeCompatibility' },
         { label: t('careerCoach.title'), icon: 'chatbubbles-outline', screen: 'CareerCoach' },
+        { label: t('voiceRecorder.title'), icon: 'mic-outline', screen: 'VoiceRecorder' },
+        { label: t('textReader.title'), icon: 'volume-high-outline', screen: 'TextReader' },
       ]
     }
   ];

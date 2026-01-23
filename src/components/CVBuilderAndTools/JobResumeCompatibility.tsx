@@ -11,6 +11,7 @@ import { useThemeColors } from '../../utils/themeColors';
 import { useTailwind } from '../../utils/tailwind';
 import { NativeAd } from '../../components/ads/NativeAd';
 import { useRewardedAd } from '../../components/ads/useRewardedAd';
+import { useInterstitialAd } from '../../components/ads/useInterstitialAd';
 
 // Steps
 import { JobInputStep } from './steps/JobInputStep';
@@ -33,6 +34,7 @@ export const JobResumeCompatibility = () => {
   const colors = useThemeColors();
   const tw = useTailwind();
   const { loaded, showRewarded, reward } = useRewardedAd();
+  const { loaded: interstitialLoaded, showInterstitial } = useInterstitialAd();
   const { user } = useAuth();
   // Wallet Hook
   const { balance, spendCredits, prices, refreshBalance } = useWallet();
@@ -88,6 +90,10 @@ export const JobResumeCompatibility = () => {
 
   const startAnalysis = async () => {
     setLoading(true);
+    // Show interstitial ad if available while it's generating
+    if (interstitialLoaded) {
+      showInterstitial();
+    }
     try {
         const formData = new FormData();
         const userId = (user as any)?.$id || (user as any)?.uid || (user as any)?.id;

@@ -472,6 +472,8 @@ export const HomeScreen = () => {
             {[
               { icon: 'sparkles-outline', title: t('home.sofia'), sub: t('home.sofiaSub'), color: '#6366f1', bg: 'rgba(99,102,241,0.15)', screen: 'CareerCoach' },
               { icon: 'document-attach-outline', title: t('home.compatibility'), sub: t('home.compatibilitySub'), color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', screen: 'JobResumeCompatibility' },
+              { icon: 'mic-outline', title: t('voiceRecorder.title'), sub: t('voiceRecorder.ready'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)', screen: 'VoiceRecorder' },
+              { icon: 'volume-high-outline', title: t('textReader.title'), sub: t('textReader.voiceConfig'), color: '#137fec', bg: 'rgba(19,127,236,0.15)', screen: 'TextReader' },
               { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
               { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)' },
             ].map((m, i) => (
@@ -499,9 +501,11 @@ export const HomeScreen = () => {
             {[
               { icon: 'chatbubbles-outline', title: t('home.forum'), sub: t('home.forumSub'), color: '#ec4899', bg: 'rgba(236,72,153,0.15)' },
               { icon: 'flash-outline', title: t('home.flashcards'), sub: t('home.flashcardsSub'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
+              { icon: 'mic-outline', title: t('voiceRecorder.title'), sub: t('home.recordPracticeSub'), color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)', screen: 'VoiceRecorder' },
             ].map((m, i) => (
               <TouchableOpacity
                 key={`second-${i}`}
+                onPress={() => m.screen && navigation.navigate(m.screen)}
                 style={[
                   tw('rounded-2xl p-4 items-center mb-4'),
                   shadow.metric,

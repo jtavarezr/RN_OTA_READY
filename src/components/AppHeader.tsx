@@ -15,6 +15,9 @@ interface AppHeaderProps extends ViewProps {
   onMenuPress?: () => void;
   onSearchPress?: () => void;
   onNotificationPress?: () => void;
+  onBackPress?: () => void;
+  showBack?: boolean;
+  title?: string;
   notificationCount?: number;
   userName?: string;
   userRole?: string;
@@ -25,6 +28,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onMenuPress,
   onSearchPress,
   onNotificationPress,
+  onBackPress,
+  showBack = false,
+  title,
   notificationCount = 5,
   userName,
  //userRole = 'Senior Developer',
@@ -41,7 +47,9 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const { toggleSidebar } = useSidebar();
 
   const handleMenuPress = () => {
-    if (onMenuPress) {
+    if (showBack && onBackPress) {
+      onBackPress();
+    } else if (onMenuPress) {
       onMenuPress();
     }
     else {
@@ -52,7 +60,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   const { profile } = useProfileStore();
   const displayName = userName || profile?.fullName || 'Alex Rodriguez';
   const displayAvatar = userAvatar || profile?.profilePicture || DEFAULT_AVATAR || RANDOM_AVATAR;
-  const userRole = profile?.headline || 'Role';
+  const displayRole = profile?.headline || 'Role';
 
   return (
     <SafeAreaView 
@@ -66,17 +74,26 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       <View style={tw('flex-row justify-between items-center px-4 py-3')}>
         <View style={tw('flex-row items-center')}>
           <TouchableOpacity style={tw('mr-3')} onPress={handleMenuPress}>
-            <Ionicons name="menu" size={24} color={colors.primary} />
+            <Ionicons name={showBack ? "arrow-back" : "menu"} size={24} color={colors.primary} />
           </TouchableOpacity>
-          <Image source={{ uri: displayAvatar }} style={tw('w-10 h-10 rounded-full mr-3')} />
-          <View>
-            <Text style={[tw('text-base font-semibold'), { color: colors.primary }]}>
-              {displayName}
+          
+          {title ? (
+            <Text style={[tw('text-lg font-bold'), { color: colors.primary }]}>
+              {title}
             </Text>
-            <Text style={[{ color: colors.textSecondary, fontSize: 12 }]}>
-              {userRole}
-            </Text>
-          </View>
+          ) : (
+            <>
+              <Image source={{ uri: displayAvatar }} style={tw('w-10 h-10 rounded-full mr-3')} />
+              <View>
+                <Text style={[tw('text-base font-semibold'), { color: colors.primary }]}>
+                  {displayName}
+                </Text>
+                <Text style={[{ color: colors.textSecondary, fontSize: 12 }]}>
+                  {displayRole}
+                </Text>
+              </View>
+            </>
+          )}
         </View>
         <View style={tw('flex-row items-center')}>
           <TouchableOpacity

@@ -14,6 +14,8 @@ import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { JobResumeCompatibility } from '../components/CVBuilderAndTools/JobResumeCompatibility';
 import { CareerCoachScreen } from '../screens/tools/CareerCoachScreen';
+import VoiceRecorder from '../screens/tools/VoiceRecorder';
+import TextReader from '../screens/tools/textReader';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/AppHeader';
@@ -71,6 +73,16 @@ const MainTabs = () => (
       <Tab.Screen 
         name="CareerCoach" 
         component={CareerCoachScreen} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="VoiceRecorder" 
+        component={VoiceRecorder} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="TextReader" 
+        component={TextReader} 
         options={{ tabBarButton: () => null, headerShown: false }} 
       />
     </Tab.Navigator>

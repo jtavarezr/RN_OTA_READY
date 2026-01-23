@@ -14,6 +14,7 @@ import './src/i18n';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { TailwindProvider } from 'tailwind-rn';
 import utilities from './tailwind.json';
+import { useAppOpenAd } from './src/components/ads/useAppOpenAd';
 
 // Prevent the native splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -22,6 +23,9 @@ const AppContent = () => {
   const { theme } = useTheme();
   const { primaryColor, fontColor } = useSettingsStore();
   const [isSplashFinished, setIsSplashFinished] = useState(false);
+  
+  // Initialize App Open Ad hook to handle ads on app resume/start
+  useAppOpenAd();
 
   useEffect(() => {
     // Hide the native splash screen once the component mounts
