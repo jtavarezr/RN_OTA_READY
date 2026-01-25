@@ -255,6 +255,24 @@
     "disclaimerTitle": "Aviso del Asistente IA",
     "disclaimerMessage": "Las respuestas son generadas por IA y pueden contener errores. Cada sesión está limitada a {{count}} interacciones."
   },
+  "jobBoard": {
+    "title": "BOLSA DE EMPLEO",
+    "searchPlaceholder": "Buscar empleo (ej. React Developer)...",
+    "source": "FUENTE DE DATOS",
+    "selectedSource": "FUENTE SELECCIONADA",
+    "remote": "Remoto (Remotive)",
+    "local": "Local (USAJOBS)",
+    "noLocalJobs": "No se encontraron empleos locales para esta búsqueda.",
+    "noRemoteJobs": "No se encontraron empleos remotos para esta búsqueda.",
+    "noOffers": "No hay ofertas disponibles.",
+    "selectSource": "Seleccionar Fuente",
+    "remoteRemotive": "Remoto - Remotive API",
+    "globalTheMuse": "Global - The Muse",
+    "localUSAJOBS": "Local - USAJOBS (Orlando)",
+    "description": "Descripción del Puesto",
+    "noDescription": "No hay descripción disponible.",
+    "applyNow": "Postular Ahora"
+  },
   "common": {
     "ok": "OK"
   }

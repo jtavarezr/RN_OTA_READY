@@ -474,7 +474,7 @@ export const HomeScreen = () => {
               { icon: 'document-attach-outline', title: t('home.compatibility'), sub: t('home.compatibilitySub'), color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', screen: 'JobResumeCompatibility' },
               { icon: 'mic-outline', title: t('voiceRecorder.title'), sub: t('voiceRecorder.ready'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)', screen: 'VoiceRecorder' },
               { icon: 'volume-high-outline', title: t('textReader.title'), sub: t('textReader.voiceConfig'), color: '#137fec', bg: 'rgba(19,127,236,0.15)', screen: 'TextReader' },
-              { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)' },
+              { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)', screen: 'JobBoard' },
               { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)' },
             ].map((m, i) => (
               <TouchableOpacity
@@ -495,9 +495,9 @@ export const HomeScreen = () => {
             ))}
             
             {/* Native Ads Small */}
-            <NativeAdSmall style={{ width: (width - 48) / 2 }} />
-            <NativeAdSmall style={{ width: (width - 48) / 2 }} />
-
+            {/* <NativeAdSmall style={{ width: (width - 48) / 2 }} />
+            <NativeAdSmall style={{ width: (width - 48) / 2 }} /> */}
+            {/*
             {[
               { icon: 'chatbubbles-outline', title: t('home.forum'), sub: t('home.forumSub'), color: '#ec4899', bg: 'rgba(236,72,153,0.15)' },
               { icon: 'flash-outline', title: t('home.flashcards'), sub: t('home.flashcardsSub'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)' },
@@ -519,6 +519,7 @@ export const HomeScreen = () => {
                 <Text appearance="hint" colors={colors} style={{ fontSize: 11, marginTop: 2 }}>{m.sub}</Text>
               </TouchableOpacity>
             ))}
+            */}
           </View>
         </View>
 
@@ -528,7 +529,7 @@ export const HomeScreen = () => {
           <NativeAd />
         </View>
         {/* Recent Activity */}
-        <View style={tw('mb-6')}>
+        {/*<View style={tw('mb-6')}>
           <Text category="label" appearance="hint" colors={colors} style={tw('mb-3')}>{t('home.recentActivity')}</Text>
           {[
             { icon: 'checkmark-circle', color: colors.success, title: t('home.appSent'), sub: t('home.softwareEngineer'), time: t('home.time2h') },
@@ -553,7 +554,7 @@ export const HomeScreen = () => {
               <Text appearance="hint" colors={colors} style={tw('text-[11px]')}>{act.time}</Text>
             </View>
           ))}
-        </View>
+        </View>/*}
 
         {/* Sidebar Ads */}
         {/*<View style={tw('mb-8 items-center')}>

@@ -14,13 +14,14 @@ import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
 import { JobResumeCompatibility } from '../components/CVBuilderAndTools/JobResumeCompatibility';
 import { CareerCoachScreen } from '../screens/tools/CareerCoachScreen';
-import VoiceRecorder from '../screens/tools/VoiceRecorder';
-import TextReader from '../screens/tools/textReader';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
 import { useTranslation } from 'react-i18next';
 import { AppHeader } from '../components/AppHeader';
 import { SidebarProvider } from '../context/SidebarContext';
 import { CustomSidebar } from '../components/CustomSidebar';
+import JobBoard from '../screens/tools/JobBoard';
+import VoiceRecorder from '../screens/tools/VoiceRecorder';
+import TextReader from '../screens/tools/textReader';
 
 // Navigation Stacks
 const Stack = createStackNavigator();
@@ -46,7 +47,6 @@ const BottomTabBar = ({ navigation, state }: any) => {
             <BottomNavigationTab title={t('utility')} icon={(props) => <Icon {...props} name='grid-outline'/>} />
             <BottomNavigationTab title={t('profile')} icon={(props) => <Icon {...props} name='person-outline'/>} />
             <BottomNavigationTab title={t('settings')} icon={(props) => <Icon {...props} name='settings-outline'/>} />
-            <BottomNavigationTab title="Ads" icon={(props) => <Icon {...props} name='gift-outline'/>} />
         </BottomNavigation>
     );
 };
@@ -64,7 +64,7 @@ const MainTabs = () => (
       <Tab.Screen name="Utility" component={UtilityScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
-      <Tab.Screen name="Ads" component={AdsScreenDemo} />
+      <Tab.Screen name="Ads" component={AdsScreenDemo} options={{ tabBarButton: () => null }} />
       <Tab.Screen 
         name="JobResumeCompatibility" 
         component={JobResumeCompatibility} 
@@ -83,6 +83,11 @@ const MainTabs = () => (
       <Tab.Screen 
         name="TextReader" 
         component={TextReader} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="JobBoard" 
+        component={JobBoard} 
         options={{ tabBarButton: () => null, headerShown: false }} 
       />
     </Tab.Navigator>
