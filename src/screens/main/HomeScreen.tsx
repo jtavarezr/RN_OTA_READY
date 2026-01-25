@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useWallet } from '../../context/WalletContext';
 import { useRewardedAd } from '../../components/ads/useRewardedAd';
 import { useThemeColors, ThemeColors } from '../../utils/themeColors';
+import { useLearningStore } from '../../store/useLearningStore';
 
 const { width } = Dimensions.get('window');
 
@@ -160,6 +161,7 @@ export const HomeScreen = () => {
   const colors = useThemeColors();
   const tw = useTailwind();
   const { balance, earnCredits } = useWallet(); // Wallet integration
+  const learningStore = useLearningStore();
   
   // Ad Integration
   const { loaded, showRewarded, reward } = useRewardedAd();
@@ -214,7 +216,8 @@ export const HomeScreen = () => {
   };
 
   const MiniBar = ({ data, height = 56, color = colors.primary }: ChartProps) => {
-    const max = Math.max(...data);
+    if (!data || data.length === 0) return null;
+    const max = Math.max(...data) || 1;
     const w = (width - 88) / data.length - 5;
     return (
       <View style={{ flexDirection: 'row', alignItems: 'flex-end', height, gap: 5 }}>
@@ -235,13 +238,18 @@ export const HomeScreen = () => {
   };
 
   const MiniLine = ({ data, height = 56, color = colors.success }: ChartProps) => {
-    const max = Math.max(...data);
+    if (!data || data.length === 0) return null;
+
+    const max = Math.max(...data) || 1;
     const w = width - 88;
-    const step = w / (data.length - 1);
+    const step = data.length > 1 ? w / (data.length - 1) : 0;
     const points = data.map((v, i) => `${i * step},${height - (v / max) * height}`).join(' ');
+
     return (
       <Svg width={w} height={height}>
-        <Path d={`M ${points}`} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
+        {data.length > 1 && (
+          <Path d={`M ${points}`} stroke={color} strokeWidth={2.5} fill="none" strokeLinecap="round" />
+        )}
         {data.map((v, i) => (
           <Circle key={i} cx={i * step} cy={height - (v / max) * height} r={3.5} fill={color} />
         ))}
@@ -317,7 +325,9 @@ export const HomeScreen = () => {
   };
 
   const renderLearning = () => {
-    const d = data as LearningData;
+    const stats = learningStore.getStats();
+    const progressData = learningStore.getOverallProgress();
+
     return (
       <Card colors={colors}>
         <View style={tw('flex-row justify-between mb-4')}>
@@ -326,23 +336,23 @@ export const HomeScreen = () => {
             <View style={tw('flex-row items-center mt-1')}>
               <Ionicons name="flame" size={14} color={colors.warning} />
               <Text colors={colors} style={tw('ml-1.5 text-xs font-semibold text-yellow-500')}>
-                {t('home.streak', { count: d.streak })}
+                {t('home.streak', { count: stats.streak })}
               </Text>
             </View>
           </View>
           <View style={tw('items-end')}>
-            <Text category="h5" colors={colors} style={{ color: colors.success }}>{d.hours}h</Text>
+            <Text category="h5" colors={colors} style={{ color: colors.success }}>{stats.totalHours}h</Text>
             <Text appearance="hint" colors={colors} style={tw('text-xs')}>{t('home.total')}</Text>
           </View>
         </View>
-        <MiniLine data={d.progress} color={colors.success} />
+        <MiniLine data={progressData} color={colors.success} />
         <Text appearance="hint" colors={colors} style={tw('text-xs mt-2 text-center')}>
           {t('home.last5Courses')}
         </Text>
         <View style={[tw('flex-row justify-around pt-4 mt-3 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
-            { value: d.inProgress, label: t('home.inProgress'), color: '#8b5cf6' },
-            { value: d.completed, label: t('home.completed'), color: colors.success },
+            { value: stats.inProgress, label: t('home.inProgress'), color: '#8b5cf6' },
+            { value: stats.completed, label: t('home.completed'), color: colors.success },
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
@@ -475,7 +485,7 @@ export const HomeScreen = () => {
               { icon: 'mic-outline', title: t('voiceRecorder.title'), sub: t('voiceRecorder.ready'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)', screen: 'VoiceRecorder' },
               { icon: 'volume-high-outline', title: t('textReader.title'), sub: t('textReader.voiceConfig'), color: '#137fec', bg: 'rgba(19,127,236,0.15)', screen: 'TextReader' },
               { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)', screen: 'JobBoard' },
-              { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)' },
+              { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)', screen: 'Courses' },
             ].map((m, i) => (
               <TouchableOpacity
                 key={i}

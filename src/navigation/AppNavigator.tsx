@@ -12,6 +12,7 @@ import { UtilityScreen } from '../screens/main/UtilityScreen';
 import { SettingsScreen } from '../screens/main/SettingsScreen';
 import { ProfileScreen } from '../screens/main/ProfileScreen';
 import { AdsScreenDemo } from '../screens/main/AdsScreenDemo';
+import { CoursesScreen } from '../screens/main/CoursesScreen';
 import { JobResumeCompatibility } from '../components/CVBuilderAndTools/JobResumeCompatibility';
 import { CareerCoachScreen } from '../screens/tools/CareerCoachScreen';
 import { BottomNavigation, BottomNavigationTab, Icon, IconElement } from '@ui-kitten/components';
@@ -88,6 +89,11 @@ const MainTabs = () => (
       <Tab.Screen 
         name="JobBoard" 
         component={JobBoard} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="Courses" 
+        component={CoursesScreen} 
         options={{ tabBarButton: () => null, headerShown: false }} 
       />
     </Tab.Navigator>
