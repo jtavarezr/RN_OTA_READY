@@ -6,8 +6,10 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useTailwind } from '../../utils/tailwind';
 import { useThemeColors } from '../../utils/themeColors';
-import { eduService, Question } from '../../services/eduService';
+import { Question } from '../../services/eduService';
 import { usePracticeStore } from '../../store/usePracticeStore';
+import { useCategories, useQuestions } from '../../hooks/useEduQueries';
+
 
 // Simple UI components helper
 const RNText = require('react-native').Text;
@@ -22,8 +24,6 @@ export const PracticeZoneScreen = () => {
     const tw = useTailwind();
     const colors = useThemeColors();
 
-    const [loading, setLoading] = useState(false);
-    const [categories, setCategories] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [currentQIndex, setCurrentQIndex] = useState(0);
@@ -32,36 +32,29 @@ export const PracticeZoneScreen = () => {
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [showExplanation, setShowExplanation] = useState(false);
 
-    useEffect(() => {
-        const loadCategories = async () => {
-            setLoading(true);
-            const cats = await eduService.getCategories();
-            setCategories(cats.length > 0 ? cats : ['Development', 'Design', 'Soft Skills', 'Business']);
-            setLoading(false);
-        };
-        loadCategories();
-    }, []);
+    const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+    const categories = categoriesData || ['Development', 'Design', 'Soft Skills', 'Business'];
+
+    const { data: questionsData, isLoading: questionsLoading, refetch: fetchQuestions } = useQuestions(selectedCategory || '', undefined);
 
     const startQuiz = async (category: string) => {
-        setLoading(true);
         setSelectedCategory(category);
-        const fetched = await eduService.getQuestions(category);
-        
-        const shuffled = fetched.sort(() => 0.5 - Math.random()).slice(0, 10);
-        
-        if (shuffled.length === 0) {
-            Alert.alert("No questions", "No questions found for this category.");
-            setLoading(false);
-            setSelectedCategory(null);
-            return;
-        }
-
-        setQuestions(shuffled);
-        setCurrentQIndex(0);
-        setScore(0);
-        setQuizFinished(false);
-        setLoading(false);
+        // We could use questionsData if it's already fetched, but we might want a fresh batch or shuffled ones
     };
+
+    useEffect(() => {
+        if (selectedCategory && questionsData && questionsData.length > 0) {
+            const shuffled = [...questionsData].sort(() => 0.5 - Math.random()).slice(0, 10);
+            setQuestions(shuffled);
+            setCurrentQIndex(0);
+            setScore(0);
+            setQuizFinished(false);
+        } else if (selectedCategory && questionsData && questionsData.length === 0) {
+            Alert.alert("No questions", "No questions found for this category.");
+            setSelectedCategory(null);
+        }
+    }, [selectedCategory, questionsData]);
+
 
     const handleOptionSelect = (option: string) => {
         if (selectedOption !== null) return;
@@ -96,13 +89,14 @@ export const PracticeZoneScreen = () => {
         setQuizFinished(false);
     };
 
-    if (loading) {
+    if (categoriesLoading || (selectedCategory && questionsLoading && questions.length === 0)) {
         return (
             <View style={[tw('flex-1 justify-center items-center'), { backgroundColor: colors.background }]}>
                 <ActivityIndicator size="large" color={colors.primary} />
             </View>
         );
     }
+
 
     if (!selectedCategory) {
         return (

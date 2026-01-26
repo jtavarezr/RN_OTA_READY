@@ -8,7 +8,7 @@ import { useTailwind } from '../../utils/tailwind';
 import { useThemeColors } from '../../utils/themeColors';
 import { useLearningStore } from '../../store/useLearningStore';
 import { usePracticeStore } from '../../store/usePracticeStore';
-// import { LinearGradient } from 'expo-linear-gradient'; // Removed: Package not installed
+import { useCourse } from '../../hooks/useEduQueries';
 
 const { width } = Dimensions.get('window');
 
@@ -56,45 +56,30 @@ export const StudyHubScreen = () => {
     const practiceTotalQuizzes = usePracticeStore(state => state.attempts?.length || 0);
 
     // Real "Resume Learning" logic
-    const [lastActivity, setLastActivity] = useState<any>(null);
     const coursesProgress = useLearningStore(state => state.coursesProgress);
+    
+    // Find most recently accessed course ID
+    const lastCourseId = React.useMemo(() => {
+        const progresses = Object.values(coursesProgress || {});
+        if (progresses.length === 0) return null;
+        const last = progresses.reduce((prev, current) => 
+            (prev.lastAccessed > current.lastAccessed) ? prev : current
+        );
+        return last?.courseId || null;
+    }, [coursesProgress]);
 
-    useEffect(() => {
-        const fetchLastCourse = async () => {
-            const progresses = Object.values(coursesProgress || {});
-            if (progresses.length === 0) return;
-
-            // Find most recently accessed (max timestamp)
-            const last = progresses.reduce((prev, current) => 
-                (prev.lastAccessed > current.lastAccessed) ? prev : current
-            );
-
-            if (last && last.lastAccessed > 0) {
-                // Prevent redundant fetch if already set to this course
-                if (lastActivity && lastActivity.title && last.progress === lastActivity.progress) return; // Simple check
-
-                try {
-                    // We need to fetch the course title/details since store only has ID
-                    // Assuming we import the service (added import below if missing)
-                    const { eduService } = require('../../services/eduService'); 
-                    const courseDetails = await eduService.getCourse(last.courseId);
-                    
-                    if (courseDetails) {
-                        setLastActivity({
-                            title: courseDetails.title,
-                            progress: last.progress,
-                            type: 'course', // could be derived
-                            thumbnail: courseDetails.thumbnail
-                        });
-                    }
-                } catch (e) {
-                    console.error("Failed to load resume course", e);
-                }
-            }
+    const { data: courseDetails } = useCourse(lastCourseId || '');
+    const lastActivity = React.useMemo(() => {
+        if (!courseDetails || !lastCourseId) return null;
+        const progress = coursesProgress?.[lastCourseId]?.progress || 0;
+        return {
+            title: courseDetails.title,
+            progress,
+            type: 'course',
+            thumbnail: courseDetails.thumbnail
         };
+    }, [courseDetails, lastCourseId, coursesProgress]);
 
-        fetchLastCourse();
-    }, [coursesProgress, lastActivity]);
 
     const QuickStat = ({ icon, value, label, color }: any) => (
         <View style={[tw('flex-1 p-4 rounded-2xl mr-3'), { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.cardBorder }]}>

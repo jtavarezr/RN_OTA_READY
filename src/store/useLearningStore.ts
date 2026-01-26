@@ -1,6 +1,5 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { dbService } from '../services/dbService';
 
 export interface Course {
   id: string;
@@ -21,89 +20,111 @@ interface LearningState {
   coursesProgress: Record<string, CourseProgress>;
   streak: number;
   totalHours: number;
-  updateProgress: (courseId: string, progress: number) => void;
+  init: () => Promise<void>;
+  updateProgress: (courseId: string, progress: number, userId: string) => void;
   getCourseProgress: (courseId: string) => number;
+
   getOverallProgress: () => number[];
   getStats: () => { inProgress: number; completed: number; totalHours: number; streak: number };
   incrementTotalHours: (hours: number) => void;
 }
 
-export const useLearningStore = create<LearningState>()(
-  persist(
-    (set, get) => ({
-      coursesProgress: {},
-      streak: 0,
-      totalHours: 0,
+export const useLearningStore = create<LearningState>()((set, get) => ({
+  coursesProgress: {},
+  streak: 0,
+  totalHours: 0,
 
-      updateProgress: (courseId, progress) => {
-        const now = Date.now();
-        const today = new Date().toDateString();
-        
-        set((state) => {
-          const prevProgress = state.coursesProgress[courseId]?.progress || 0;
-          const isCompleting = prevProgress < 100 && progress === 100;
-          
-          // Basic streak logic: if they did something today
-          // This should ideally be more robust (checking consecutive days)
-          // For MVP, we'll increment streak if last activity was yesterday
-          const lastActivityDate = state.coursesProgress && Object.values(state.coursesProgress).length > 0 
-            ? new Date(Math.max(...Object.values(state.coursesProgress).map(p => p.lastAccessed))).toDateString()
-            : null;
-          
-          let newStreak = state.streak;
-          if (lastActivityDate !== today) {
-             // If last activity was yesterday, increment. If older, reset to 1.
-             // Simplified: just set to 1 if first today or increment if yesterday.
-             newStreak = state.streak === 0 ? 1 : state.streak + 1; 
-          }
+  init: async () => {
+    const streak = await dbService.getStat('streak', 0);
+    const totalHours = await dbService.getStat('totalHours', 0);
+    const progresses = await dbService.getAll('progress');
+    
+    const progressMap: Record<string, CourseProgress> = {};
+    progresses.forEach((p: any) => {
+      progressMap[p.courseId] = {
+        courseId: p.courseId,
+        progress: p.percentage,
+        lastAccessed: p.lastSync
+      };
+    });
 
-          return {
-            streak: newStreak,
-            coursesProgress: {
-              ...state.coursesProgress,
-              [courseId]: {
-                courseId,
-                progress: Math.min(100, Math.max(0, progress)),
-                lastAccessed: now,
-              },
-            },
-          };
-        });
-      },
+    set({ streak, totalHours, coursesProgress: progressMap });
+  },
 
-      incrementTotalHours: (hours: number) => {
-        set((state) => ({ totalHours: state.totalHours + hours }));
-      },
+  updateProgress: (courseId, progress, userId) => {
+    const now = Date.now();
+    const today = new Date().toDateString();
+    
+    set((state) => {
+      const prevProgress = state.coursesProgress[courseId]?.progress || 0;
+      
+      const lastActivityDate = state.coursesProgress && Object.values(state.coursesProgress).length > 0 
+        ? new Date(Math.max(...Object.values(state.coursesProgress).map(p => p.lastAccessed))).toDateString()
+        : null;
+      
+      let newStreak = state.streak;
+      if (lastActivityDate !== today) {
+         newStreak = state.streak === 0 ? 1 : state.streak + 1; 
+         dbService.setStat('streak', newStreak);
+      }
 
-      getCourseProgress: (courseId) => {
-        return get().coursesProgress[courseId]?.progress || 0;
-      },
+      const updatedProgress = {
+        courseId,
+        progress: Math.min(100, Math.max(0, progress)),
+        lastAccessed: now,
+      };
 
-      getOverallProgress: () => {
-        const progresses = Object.values(get().coursesProgress)
-          .sort((a, b) => b.lastAccessed - a.lastAccessed)
-          .slice(0, 5)
-          .map((p) => p.progress);
-        
-        // Return at least some data for the chart if empty
-        return progresses.length > 0 ? progresses : [0, 0, 0, 0, 0];
-      },
+      // Background SQLite update
+      dbService.upsert('progress', `${courseId}:${userId}`, {
+         courseId: courseId,
+         userId: userId,
+         percentage: updatedProgress.progress,
+         lastSync: now
+      });
 
-      getStats: () => {
-        const progresses = Object.values(get().coursesProgress);
-        const inProgress = progresses.filter(p => p.progress > 0 && p.progress < 100).length;
-        const completed = progresses.filter(p => p.progress === 100).length;
-        return {
-          inProgress: inProgress || 0,
-          completed: completed || 0,
-          totalHours: get().totalHours,
-          streak: get().streak,
-        };
-      },
-    }),
-    {
-      name: 'learning-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
-);
+
+
+      return {
+        streak: newStreak,
+        coursesProgress: {
+          ...state.coursesProgress,
+          [courseId]: updatedProgress,
+        },
+      };
+    });
+  },
+
+  incrementTotalHours: (hours: number) => {
+    set((state) => {
+      const newTotal = state.totalHours + hours;
+      dbService.setStat('totalHours', newTotal);
+      return { totalHours: newTotal };
+    });
+  },
+
+  getCourseProgress: (courseId) => {
+    return get().coursesProgress[courseId]?.progress || 0;
+  },
+
+  getOverallProgress: () => {
+    const progresses = Object.values(get().coursesProgress)
+      .sort((a, b) => b.lastAccessed - a.lastAccessed)
+      .slice(0, 5)
+      .map((p) => p.progress);
+    
+    return progresses.length > 0 ? progresses : [0, 0, 0, 0, 0];
+  },
+
+  getStats: () => {
+    const progresses = Object.values(get().coursesProgress);
+    const inProgress = progresses.filter(p => p.progress > 0 && p.progress < 100).length;
+    const completed = progresses.filter(p => p.progress === 100).length;
+    return {
+      inProgress: inProgress || 0,
+      completed: completed || 0,
+      totalHours: get().totalHours,
+      streak: get().streak,
+    };
+  },
+}));
+

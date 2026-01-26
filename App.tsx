@@ -12,9 +12,25 @@ import { AppNavigator } from './src/navigation/AppNavigator';
 import { CustomSplashScreen } from './src/components/CustomSplashScreen';
 import './src/i18n';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SyncProvider } from './src/context/SyncContext';
+import { getDb } from './src/utils/db';
+import { useLearningStore } from './src/store/useLearningStore';
+
+import { usePracticeStore } from './src/store/usePracticeStore';
+
 import { TailwindProvider } from 'tailwind-rn';
 import utilities from './tailwind.json';
 import { useAppOpenAd } from './src/components/ads/useAppOpenAd';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    },
+  },
+});
 
 // Prevent the native splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -28,18 +44,24 @@ const AppContent = () => {
   useAppOpenAd();
 
   useEffect(() => {
-    // Hide the native splash screen once the component mounts
-    // so our CustomSplashScreen becomes visible
-    const hideNativeSplash = async () => {
+    // Hide the native splash screen and init DB
+    const startup = async () => {
       try {
+        await getDb(); // Safe singleton init
+        await useLearningStore.getState().init();
+        await usePracticeStore.getState().init();
         await SplashScreen.hideAsync();
+
+
       } catch (e) {
-        console.warn('Error hiding splash screen:', e);
+
+        console.warn('Error during startup:', e);
       }
     };
     
-    hideNativeSplash();
+    startup();
   }, []);
+
 
   if (!isSplashFinished) {
     return <CustomSplashScreen onFinish={() => setIsSplashFinished(true)} />;
@@ -66,17 +88,23 @@ const AppContent = () => {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <IconRegistry icons={EvaIconsPack} />
-      {/* @ts-ignore - TailwindProvider types might be mismatching but it supports children */}
-      <TailwindProvider utilities={utilities}>
-        <ThemeProvider>
-          <AuthProvider>
-            <WalletProvider>
-              <AppContent />
-            </WalletProvider>
-          </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <IconRegistry icons={EvaIconsPack} />
+        {/* @ts-ignore - TailwindProvider types might be mismatching but it supports children */}
+        <TailwindProvider utilities={utilities}>
+          <ThemeProvider>
+          <SyncProvider>
+            <AuthProvider>
+              <WalletProvider>
+                <AppContent />
+              </WalletProvider>
+            </AuthProvider>
+          </SyncProvider>
         </ThemeProvider>
-      </TailwindProvider>
+
+        </TailwindProvider>
+      </QueryClientProvider>
     </SafeAreaProvider>
+
   );
 }

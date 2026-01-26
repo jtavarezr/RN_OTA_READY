@@ -5,7 +5,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useTailwind } from '../utils/tailwind';
 import { useThemeColors } from '../utils/themeColors';
 import { useAuth } from '../context/AuthContext';
-import { useProfileStore } from '../store/useProfileStore';
+import { useProfile } from '../hooks/useProfileQueries';
+
 
 const DEFAULT_AVATAR = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 const RANDOM_AVATAR = 'https://i.pravatar.cc/100';
@@ -57,10 +58,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     }
   };
 
-  const { profile } = useProfileStore();
+  const { data: profile } = useProfile((user as any)?.$id || (user as any)?.uid || (user as any)?.id);
   const displayName = userName || profile?.fullName || 'Alex Rodriguez';
   const displayAvatar = userAvatar || profile?.profilePicture || DEFAULT_AVATAR || RANDOM_AVATAR;
   const displayRole = profile?.headline || 'Role';
+
 
   return (
     <SafeAreaView 

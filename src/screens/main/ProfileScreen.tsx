@@ -7,8 +7,9 @@ import { useTranslation } from 'react-i18next';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { EditProfileModal } from '../../components/EditProfileModal';
 import { useAuth } from '../../context/AuthContext';
-import { useProfileStore } from '../../store/useProfileStore';
+import { useProfile, useUpdateProfile } from '../../hooks/useProfileQueries';
 import { useTailwind } from '../../utils/tailwind';
+
 
 // --- Constantes de Respaldo ---
 const DEFAULT_AVATAR = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
@@ -41,34 +42,26 @@ export const ProfileScreen = () => {
   const tw = useTailwind();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const uid = (user as any)?.uid || (user as any)?.$id || (user as any)?.id;
   
-  const { profile, loading, fetchProfile, updateProfile } = useProfileStore();
+  const { data: profile, isLoading: loading, refetch } = useProfile(uid);
+  const { mutateAsync: updateProfile, isPending: updating } = useUpdateProfile();
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-        const uid = (user as any).uid || (user as any).$id || (user as any).id;
-        fetchProfile(uid);
-    }
-  }, [user, fetchProfile]);
-
   const onRefresh = useCallback(() => {
-    if (user) {
-        const uid = (user as any).uid || (user as any).$id || (user as any).id;
-        fetchProfile(uid, true);
-    }
-  }, [user, fetchProfile]);
+    refetch();
+  }, [refetch]);
 
   const handleSave = async (data: any) => {
     try {
-      const uid = (user as any).uid || (user as any).$id || (user as any).id;
-      await updateProfile(uid, data);
+      await updateProfile({ userId: uid, data });
       setModalVisible(false);
     } catch (e) {
       console.error(e);
       Alert.alert("Error", "Could not save profile.");
     }
   };
+
 
   const renderList = (items: any[], keyTitle: string, keySub: string, keyDesc?: string, keyDates?: string) => 
     (Array.isArray(items) && items.length > 0) ? items.map((item, i) => (
@@ -223,8 +216,9 @@ export const ProfileScreen = () => {
         onClose={() => setModalVisible(false)} 
         onSubmit={handleSave} 
         initialData={profile} 
-        loading={loading} 
+        loading={updating} 
       />
+
     </ScreenLayout>
   );
 };

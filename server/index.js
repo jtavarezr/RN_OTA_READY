@@ -140,8 +140,9 @@ if (process.env.NODE_ENV !== 'test') {
         QuestionModel.setupDatabase(),
         ProgressModel.setupDatabase()
     ]).then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running at http://localhost:${PORT}`);
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running at http://0.0.0.0:${PORT}`);
+            console.log(`External access: http://192.168.1.48:${PORT}`);
             console.log(`Swagger at http://localhost:${PORT}/api-docs`);
         });
     });

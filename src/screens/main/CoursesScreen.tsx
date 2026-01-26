@@ -16,7 +16,9 @@ import { useTranslation } from 'react-i18next';
 import { useTailwind } from '../../utils/tailwind';
 import { useThemeColors } from '../../utils/themeColors';
 import { useLearningStore } from '../../store/useLearningStore';
+import { useAuth } from '../../context/AuthContext';
 import { eduService, Course } from '../../services/eduService';
+
 
 const { width } = Dimensions.get('window');
 
@@ -55,7 +57,10 @@ export const CoursesScreen = () => {
   const { t } = useTranslation();
   const tw = useTailwind();
   const colors = useThemeColors();
+  const { user } = useAuth();
+  const userId = (user as any)?.$id || (user as any)?.uid || (user as any)?.id;
   const { updateProgress, getCourseProgress } = useLearningStore();
+
 
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -78,8 +83,9 @@ export const CoursesScreen = () => {
     const id = course.$id || (course as any).id;
     const currentProgress = getCourseProgress(id);
     if (currentProgress < 100) {
-      updateProgress(id, Math.min(100, currentProgress + 10));
+      updateProgress(id, Math.min(100, currentProgress + 10), userId);
     }
+
     Linking.openURL(course.url).catch(err => console.error("Couldn't load page", err));
   };
 

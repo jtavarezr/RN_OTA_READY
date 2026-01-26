@@ -22,10 +22,19 @@ import { NativeAdSmall } from '../../components/ads/NativeAdSmall';
 import { BannerAdSize } from 'react-native-google-mobile-ads';
 import { useTranslation } from 'react-i18next';
 
-import { useWallet } from '../../context/WalletContext';
+import { useWalletBalance, useWalletPrices } from '../../hooks/useWalletQueries';
+import { useWalletMutations } from '../../hooks/useWalletMutations';
+import { useAuth } from '../../context/AuthContext';
+import { useSync } from '../../context/SyncContext';
+
+
 import { useRewardedAd } from '../../components/ads/useRewardedAd';
 import { useThemeColors, ThemeColors } from '../../utils/themeColors';
 import { useLearningStore } from '../../store/useLearningStore';
+import { useProfile } from '../../hooks/useProfileQueries';
+import { usePracticeStore } from '../../store/usePracticeStore';
+
+
 
 const { width } = Dimensions.get('window');
 
@@ -160,8 +169,22 @@ export const HomeScreen = () => {
   const { theme } = useTheme();
   const colors = useThemeColors();
   const tw = useTailwind();
-  const { balance, earnCredits } = useWallet(); // Wallet integration
+  
+  const { user } = useAuth();
+  const userId = (user as any)?.$id || (user as any)?.uid || (user as any)?.id;
+  const { isOnline, pendingCount } = useSync();
+
+  
+  const { data: walletData } = useWalletBalance(userId);
+
+
+  const balance = walletData?.balance || 0;
+  
+  const { earnCredits } = useWalletMutations();
+  const { data: prices } = useWalletPrices();
+  
   const learningStore = useLearningStore();
+
   
   // Ad Integration
   const { loaded, showRewarded, reward } = useRewardedAd();
@@ -173,20 +196,39 @@ export const HomeScreen = () => {
         const rewardKey = JSON.stringify(reward);
         if (rewardKey !== lastProcessedReward) {
             setLastProcessedReward(rewardKey);
-            earnCredits('VALID_AD_TOKEN');
+            earnCredits({ userId, adToken: 'VALID_AD_TOKEN' });
             alert('Reward Earned! +1 Credit');
         }
     }
-  }, [reward, lastProcessedReward]);
+  }, [reward, lastProcessedReward, userId, earnCredits]);
+
+
+   const { data: profile } = useProfile(userId);
+  const practiceStore = usePracticeStore();
+  const practiceStats = practiceStore.getStats();
+
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
   const dataMap: Record<TabType, OverviewData | CareerData | LearningData | CommunityData> = {
-    overview: { profile: 85, apps: 12, interviews: 3, matches: 8 },
+    overview: { 
+      profile: profile ? 100 : 25, // Mocked logic: if exists 100, else 25
+      apps: 12, 
+      interviews: 3, 
+      matches: 8 
+    },
+
     career: { active: 12, interviews: 24, offers: 3, rate: 68, weekly: [65,72,68,80,75,85,68] },
-    learning: { inProgress: 4, completed: 12, hours: 127, streak: 14, progress: [30,45,60,75,85] },
+    learning: { 
+      inProgress: learningStore.getStats().inProgress, 
+      completed: learningStore.getStats().completed, 
+      hours: learningStore.getStats().totalHours, 
+      streak: learningStore.getStats().streak, 
+      progress: learningStore.getOverallProgress() 
+    },
     community: { posts: 24, helpful: 56, followers: 128, rep: 892, activity: [5,8,6,12,9,15,24] },
   };
+
 
   const data = dataMap[activeTab];
 
@@ -271,25 +313,49 @@ export const HomeScreen = () => {
             <Text appearance="hint" colors={colors} style={tw('text-xs mt-1')}>{t('home.todayProgress')}</Text>
           </View>
           
-          {/* Wallet Balance Widget */}
-          <View style={[tw('flex-row items-center px-3 py-1.5 rounded-full border'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
-             <Ionicons name="wallet-outline" size={16} color={colors.primary} style={tw('mr-2')} />
-             <Text category="s2" colors={colors}>{t('home.credits', { count: balance })}</Text>
+          {/* Connectivity & Wallet Widget */}
+          <View style={tw('flex-row items-center')}>
+              <View style={[tw('flex-row items-center px-2 py-1.5 rounded-full border mr-2'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
+                  <Ionicons 
+                    name={isOnline ? "cloud-done" : "cloud-offline"} 
+                    size={16} 
+                    color={isOnline ? colors.success : colors.error} 
+                    style={tw('mr-1')} 
+                  />
+                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: isOnline ? colors.success : colors.error }}>
+                      {isOnline ? 'LIVE' : 'OFFLINE'}
+                  </Text>
+
+                  {pendingCount > 0 && (
+                      <View style={tw('ml-1.5 flex-row items-center border-l pl-1.5 border-gray-300')}>
+                          <Ionicons name="sync" size={12} color={colors.primary} />
+                          <Text style={{ fontSize: 10, fontWeight: '600', marginLeft: 2, color: colors.primary }}>{pendingCount}</Text>
+                      </View>
+                  )}
+              </View>
+
           </View>
 
           <CircularProgress percent={d.profile} />
+
         </View>
         <View style={[tw('flex-row justify-around pt-4 border-t'), { borderTopColor: colors.cardBorder }]}>
           {[
             { value: d.apps, label: t('home.applications'), color: colors.warning },
-            { value: d.interviews, label: t('home.interviews'), color: colors.success },
+            { value: practiceStats.totalQuizzes, label: t('home.interviews'), color: colors.success }, // Using quiz count as mock interview count
             { value: d.matches, label: t('home.matches'), color: colors.primary },
+
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
               <Text appearance="hint" colors={colors} style={[tw('mt-1'), { fontSize: 10 }]}>{label}</Text>
             </View>
           ))}
+        </View>
+
+        <View style={[tw('flex-row items-center px-3 py-1.5 rounded-full border'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
+          <Ionicons name="wallet-outline" size={16} color={colors.primary} style={tw('mr-2')} />
+          <Text category="s2" colors={colors}>{t('home.credits', { count: balance })}</Text>
         </View>
       </Card>
     );
