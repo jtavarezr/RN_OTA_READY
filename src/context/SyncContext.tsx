@@ -14,15 +14,19 @@ import { profileKeys } from '../hooks/useProfileQueries';
 
 interface SyncContextType {
   isOnline: boolean;
+  isServerReachable: boolean;
   pendingCount: number;
 }
+
 
 const SyncContext = createContext<SyncContextType | undefined>(undefined);
 
 export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isOnline, setIsOnline] = React.useState(true);
+  const [isServerReachable, setIsServerReachable] = React.useState(true);
   const [pendingCount, setPendingCount] = React.useState(0);
   const queryClient = useQueryClient();
+
 
   // Monitor network status
   useEffect(() => {
@@ -32,7 +36,31 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, []);
 
+  // Server Heartbeat
+  useEffect(() => {
+     let heartbeat: any;
+     const checkReachability = async () => {
+        if (!isOnline) {
+            setIsServerReachable(false);
+            return;
+        }
+        try {
+            // Ping a lightweight endpoint
+            await api.get('/api/courses', { timeout: 5000 });
+            setIsServerReachable(true);
+        } catch (e) {
+            setIsServerReachable(false);
+        }
+     };
+
+     checkReachability();
+     heartbeat = setInterval(checkReachability, 120000); // Pulse every 60s
+     return () => clearInterval(heartbeat);
+  }, [isOnline]);
+
+
   const processAction = useCallback(async (action: any) => {
+
     try {
       await dbService.updateActionStatus(action.id, 'syncing');
       
@@ -115,10 +143,11 @@ export const SyncProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [isOnline, processAction]);
 
   return (
-    <SyncContext.Provider value={{ isOnline, pendingCount }}>
+    <SyncContext.Provider value={{ isOnline, isServerReachable, pendingCount }}>
       {children}
     </SyncContext.Provider>
   );
+
 };
 
 

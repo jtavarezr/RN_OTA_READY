@@ -172,10 +172,11 @@ export const HomeScreen = () => {
   
   const { user } = useAuth();
   const userId = (user as any)?.$id || (user as any)?.uid || (user as any)?.id;
-  const { isOnline, pendingCount } = useSync();
+  const { isOnline, isServerReachable, pendingCount } = useSync();
 
-  
+
   const { data: walletData } = useWalletBalance(userId);
+
 
 
   const balance = walletData?.balance || 0;
@@ -317,14 +318,15 @@ export const HomeScreen = () => {
           <View style={tw('flex-row items-center')}>
               <View style={[tw('flex-row items-center px-2 py-1.5 rounded-full border mr-2'), { backgroundColor: colors.background, borderColor: colors.cardBorder }]}>
                   <Ionicons 
-                    name={isOnline ? "cloud-done" : "cloud-offline"} 
+                    name={isServerReachable ? "cloud-done" : "cloud-offline"} 
                     size={16} 
-                    color={isOnline ? colors.success : colors.error} 
+                    color={isServerReachable ? colors.success : colors.error} 
                     style={tw('mr-1')} 
                   />
-                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: isOnline ? colors.success : colors.error }}>
-                      {isOnline ? 'LIVE' : 'OFFLINE'}
+                  <Text style={{ fontSize: 10, fontWeight: 'bold', color: isServerReachable ? colors.success : colors.error }}>
+                      {isServerReachable ? 'LIVE' : 'OFFLINE'}
                   </Text>
+
 
                   {pendingCount > 0 && (
                       <View style={tw('ml-1.5 flex-row items-center border-l pl-1.5 border-gray-300')}>
