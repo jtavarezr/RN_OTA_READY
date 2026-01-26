@@ -1,0 +1,34 @@
+// src/services/eduService.ts (Partial Update)
+// ... existing interface/methods ...
+
+  async updateProgress(courseId: string, userId: string, percentage: number, completedLessons: string[] = [], resumePoint: string = '') {
+      try {
+        const response = await fetch(`${API_URL}/courses/${courseId}/progress`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            percentage,
+            completedLessons,
+            resumePoint
+          })
+        });
+        if (!response.ok) throw new Error('Failed to update progress');
+        return await response.json();
+      } catch (error) {
+        console.error('EduService updateProgress error:', error);
+        return null;
+      }
+  },
+
+  async getProgress(courseId: string, userId: string) {
+    try {
+      const response = await fetch(`${API_URL}/courses/${courseId}/progress?userId=${userId}`);
+      if (!response.ok) throw new Error('Failed to fetch progress');
+      return await response.json();
+    } catch (error) {
+      console.error('EduService getProgress error:', error);
+      return { percentage: 0 };
+    }
+  }
+};

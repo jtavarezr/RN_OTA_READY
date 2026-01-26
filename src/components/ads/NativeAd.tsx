@@ -97,7 +97,7 @@ export const NativeAd: React.FC<NativeAdProps> = ({ style }) => {
               </Text>
             </NativeAsset>
             <NativeAsset assetType={NativeAssetType.ADVERTISER}>
-               <Text style={[tw('text-[10px] mt-0.5'), { color: colors.textSecondary }]}>
+               <Text style={[tw('mt-0.5'), { fontSize: 10, color: colors.textSecondary }]}>
                  {nativeAd.advertiser}
                </Text>
             </NativeAsset>

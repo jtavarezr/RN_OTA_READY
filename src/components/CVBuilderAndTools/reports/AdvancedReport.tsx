@@ -56,7 +56,7 @@ export const AdvancedReport: React.FC<AdvancedReportProps> = ({ data }) => {
           
           {/* SCORE */}
           <View>
-            <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>
+<Text style={[tw('font-bold uppercase mb-1'), { fontSize: 11, letterSpacing: 1, color: colors.textSecondary }]}>
               {t('jobResume.analysisReport.matchScore')}
             </Text>
             
@@ -86,7 +86,7 @@ export const AdvancedReport: React.FC<AdvancedReportProps> = ({ data }) => {
 
           {/* EXECUTIVE SUMMARY */}
           <View>
-            <Text style={[tw('text-xs font-bold uppercase tracking-wider mb-1'), { color: colors.textSecondary }]}>
+<Text style={[tw('font-bold uppercase mb-1'), { fontSize: 11, letterSpacing: 1, color: colors.textSecondary }]}>
               {t('jobResume.analysisReport.executiveSummary')}
             </Text>
             <Text style={[tw('text-sm leading-5'), { color: colors.textMain }]}>

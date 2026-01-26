@@ -37,6 +37,33 @@ const swaggerOptions = {
                 Volunteering: { type: 'object', properties: { role: { type: 'string' }, organization: { type: 'string' } } },
                 Award: { type: 'object', properties: { name: { type: 'string' }, issuer: { type: 'string' } } },
                 Links: { type: 'object', properties: { github: { type: 'string' }, linkedin: { type: 'string' }, portfolio: { type: 'string' } } },
+
+                Course: {
+                    type: 'object',
+                    properties: {
+                        title: { type: 'string' },
+                        provider: { type: 'string' },
+                        category: { type: 'string' },
+                        url: { type: 'string' },
+                        thumbnail: { type: 'string' },
+                        description: { type: 'string' },
+                        type: { type: 'string', enum: ['videocurso', 'guided'] },
+                        status: { type: 'string', enum: ['active', 'inactive'] },
+                        tags: { type: 'string' },
+                        lessons: { type: 'string', description: 'JSON array' }
+                    }
+                },
+                Question: {
+                    type: 'object',
+                    properties: {
+                        text: { type: 'string' },
+                        options: { type: 'string', description: 'JSON array' },
+                        correctAnswer: { type: 'string' },
+                        explanation: { type: 'string' },
+                        category: { type: 'string' },
+                        difficulty: { type: 'string', enum: ['beginner', 'intermediate', 'advanced'] }
+                    }
+                },
                 UserProfile: {
                     type: 'object',
                     properties: {
@@ -76,13 +103,22 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const chatRoutes = require('./routes/chatRoutes');
 const cvRoutes = require('./routes/cvRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const questionRoutes = require('./routes/questionRoutes');
+
 const ChatModel = require('./models/chatModel');
+const QuestionModel = require('./models/questionModel');
+const CourseModel = require('./models/courseModel'); // Already required but safe
+const ProgressModel = require('./models/progressModel');
+
 // ...
 app.use('/api', profileRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/cv', cvRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/questions', questionRoutes);
 
 // Admin UI Route
 const path = require('path');
@@ -99,7 +135,10 @@ if (process.env.NODE_ENV !== 'test') {
         TransactionModel.setupDatabase(),
         ServiceModel.setupDatabase(),
         ChatModel.setupDatabase(),
-        CVModel.setupDatabase()
+        CVModel.setupDatabase(),
+        CourseModel.setupDatabase(),
+        QuestionModel.setupDatabase(),
+        ProgressModel.setupDatabase()
     ]).then(() => {
         app.listen(PORT, () => {
             console.log(`Server running at http://localhost:${PORT}`);

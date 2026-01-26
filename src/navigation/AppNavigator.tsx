@@ -23,6 +23,8 @@ import { CustomSidebar } from '../components/CustomSidebar';
 import JobBoard from '../screens/tools/JobBoard';
 import VoiceRecorder from '../screens/tools/VoiceRecorder';
 import TextReader from '../screens/tools/textReader';
+import { PracticeZoneScreen } from '../screens/main/PracticeZoneScreen';
+import { StudyHubScreen } from '../screens/main/StudyHubScreen';
 
 // Navigation Stacks
 const Stack = createStackNavigator();
@@ -92,8 +94,18 @@ const MainTabs = () => (
         options={{ tabBarButton: () => null, headerShown: false }} 
       />
       <Tab.Screen 
+        name="StudyHub" 
+        component={StudyHubScreen} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
         name="Courses" 
         component={CoursesScreen} 
+        options={{ tabBarButton: () => null, headerShown: false }} 
+      />
+      <Tab.Screen 
+        name="PracticeZone" 
+        component={PracticeZoneScreen} 
         options={{ tabBarButton: () => null, headerShown: false }} 
       />
     </Tab.Navigator>

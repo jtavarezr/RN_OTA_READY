@@ -64,6 +64,25 @@
     "completed10Interviews": "Completaste 10 entrevistas mock",
     "time1d": "Hace 1d"
   },
+  "eduHub": {
+    "courses": "Cursos Virtuales",
+    "practice": "Zona de Práctica",
+    "searchCourses": "Buscar cursos...",
+    "startCourse": "Iniciar Curso",
+    "continueCourse": "Continuar",
+    "progress": "Progreso",
+    "selectCategory": "Selecciona un Tema",
+    "startQuiz": "Comenzar Prueba",
+    "nextQuestion": "Siguiente Pregunta",
+    "checkAnswer": "Verificar Respuesta",
+    "correct": "¡Correcto!",
+    "incorrect": "Incorrecto",
+    "explanation": "Explicación",
+    "results": "Resultados de la Prueba",
+    "score": "Tu Puntuación",
+    "retry": "Intentar de Nuevo",
+    "backToMenu": "Volver al Menú"
+  },
   "voiceRecorder": {
     "title": "ANALIZADOR DE VOZ PRO",
     "systemTranscript": "SYSTEM_TRANSCRIPT.LOG",

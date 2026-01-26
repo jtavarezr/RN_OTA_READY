@@ -166,16 +166,18 @@ export const HomeScreen = () => {
   // Ad Integration
   const { loaded, showRewarded, reward } = useRewardedAd();
 
+  const [lastProcessedReward, setLastProcessedReward] = useState<any>(null);
+
   useEffect(() => {
     if (reward) {
-        // In a real app, you'd use the server-side callback, but here we can trigger it manually for testing
-        // or rely on the hook if it returned a signature. 
-        // For this demo, we assume the hook's reward event is trusted enough to trigger our backend "earn"
-        // Note: The WalletProvider's earnCredits uses a mock token currently.
-        earnCredits('VALID_AD_TOKEN');
-        alert('Reward Earned! +1 Credit');
+        const rewardKey = JSON.stringify(reward);
+        if (rewardKey !== lastProcessedReward) {
+            setLastProcessedReward(rewardKey);
+            earnCredits('VALID_AD_TOKEN');
+            alert('Reward Earned! +1 Credit');
+        }
     }
-  }, [reward]);
+  }, [reward, lastProcessedReward]);
 
   const [activeTab, setActiveTab] = useState<TabType>('overview');
 
@@ -285,7 +287,7 @@ export const HomeScreen = () => {
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
-              <Text appearance="hint" colors={colors} style={tw('text-[10px] mt-1')}>{label}</Text>
+              <Text appearance="hint" colors={colors} style={[tw('mt-1'), { fontSize: 10 }]}>{label}</Text>
             </View>
           ))}
         </View>
@@ -316,7 +318,7 @@ export const HomeScreen = () => {
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
-              <Text appearance="hint" colors={colors} style={tw('text-[10px] mt-1')}>{label}</Text>
+              <Text appearance="hint" colors={colors} style={[tw('mt-1'), { fontSize: 10 }]}>{label}</Text>
             </View>
           ))}
         </View>
@@ -356,7 +358,7 @@ export const HomeScreen = () => {
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
-              <Text appearance="hint" colors={colors} style={tw('text-[10px] mt-1')}>{label}</Text>
+              <Text appearance="hint" colors={colors} style={[tw('mt-1'), { fontSize: 10 }]}>{label}</Text>
             </View>
           ))}
         </View>
@@ -387,7 +389,7 @@ export const HomeScreen = () => {
           ].map(({ value, label, color }, i) => (
             <View key={i} style={tw('items-center')}>
               <Text category="h6" colors={colors} style={{ color }}>{value}</Text>
-              <Text appearance="hint" colors={colors} style={tw('text-[10px] mt-1')}>{label}</Text>
+              <Text appearance="hint" colors={colors} style={[tw('mt-1'), { fontSize: 10 }]}>{label}</Text>
             </View>
           ))}
         </View>
@@ -485,7 +487,7 @@ export const HomeScreen = () => {
               { icon: 'mic-outline', title: t('voiceRecorder.title'), sub: t('voiceRecorder.ready'), color: '#ef4444', bg: 'rgba(239,68,68,0.15)', screen: 'VoiceRecorder' },
               { icon: 'volume-high-outline', title: t('textReader.title'), sub: t('textReader.voiceConfig'), color: '#137fec', bg: 'rgba(19,127,236,0.15)', screen: 'TextReader' },
               { icon: 'briefcase-outline', title: t('home.jobBoard'), sub: t('home.jobBoardSub'), color: '#10b981', bg: 'rgba(16,185,129,0.15)', screen: 'JobBoard' },
-              { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)', screen: 'Courses' },
+              { icon: 'school-outline', title: t('home.courses'), sub: t('home.coursesSub'), color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)', screen: 'StudyHub' },
             ].map((m, i) => (
               <TouchableOpacity
                 key={i}
